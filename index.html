@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>ScoreV2</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- include css -->
+    <link rel="stylesheet" href="styles/app.css" type="text/css"> 
+
+    <!-- runs axios script -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+
+<body id="body">
+    <h1 id="newMatchesMsg">New matches just started, update the page!</h1>
+    <br>
+    <p><b>⠀⠀Notes:</b></p>
+    <p>* If some pressure graph doesn't show then SofaScore doesn't provide it for that match</p>
+    <p>* The <b>scoreboards are updated automatically</b> every 5 seconds</p>
+    <p>* Initially it will load 10 live matches, click at <b>Load +10 Live Matches</b> button to load more</p>
+    <br>
+    <section class="mainContainer">
+    </section>
+    <div class="footer">
+        <button id="loadMore">Load +10 Live Matches</button>
+    </div>
+    
+
+    <!-- runs my script -->
+    <script src="scripts/app.js"></script>
+</body>
+
+</html>

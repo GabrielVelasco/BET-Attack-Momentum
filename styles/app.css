@@ -1,0 +1,46 @@
+.mainContainer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: left;
+    align-items: center;
+    margin: auto;
+    /* border-style: solid; */
+}
+
+.matchContainer:hover {
+    background-color: #D6EEEE;
+}
+
+.matchContainer {
+    border-style: double;
+    border-radius: 10px;
+    margin: 15px;
+    padding-left: 10px;
+    width: 422px;
+    height: 250px;
+    background-color: white;
+}
+
+.footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 50px;
+}
+
+#newMatchesMsg{
+    color:brown;
+}
+
+h2 {
+    margin-left: 10px;
+    font-size: 14px;
+    color:brown;
+    font-family:'Lucida Console', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color:azure;
+    /* just a tests */
+    /* background-image: url("https://epostalnews.com/wallpaper/wallpaper/20220822/4k-minimalist-grey-wallpapers-wallpaper-preview.webp"); */
+}
