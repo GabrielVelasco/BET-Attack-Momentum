@@ -40,8 +40,7 @@ async function getLiveMatches(){
 
     const objConfig = {
         headers: {
-            Accept: "application/x-www-form-urlencoded",
-            "Access-Control-Allow-Origin": "*"
+            "access-control-allow-origin": "*"
         }
     };
 
