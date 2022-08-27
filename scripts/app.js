@@ -40,11 +40,12 @@ async function getLiveMatches(){
 
     const objConfig = {
         headers: {
-            "access-control-allow-origin": "*"
+            "Origin": "*",
+            "x-requested-with": "*"
         }
     };
 
-    const dataFromSofaScore = await axios.get("https://api.sofascore.com/api/v1/sport/football/events/live", objConfig);
+    const dataFromSofaScore = await axios.get("https://cors-anywhere.herokuapp.com/https://api.sofascore.com/api/v1/sport/football/events/live", objConfig);
     let oldSize = liveMatches.length;
     liveMatches = dataFromSofaScore.data.events;
     let newSize = liveMatches.length;
