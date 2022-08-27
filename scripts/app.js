@@ -45,7 +45,8 @@ async function getLiveMatches(){
         }
     };
 
-    const dataFromSofaScore = await axios.get("https://cors-anywhere.herokuapp.com/https://api.sofascore.com/api/v1/sport/football/events/live", objConfig);
+    const url = "http://0.0.0.0:8080/https://api.sofascore.com/api/v1/sport/football/events/live";
+    const dataFromSofaScore = await axios.get(url, objConfig);
     let oldSize = liveMatches.length;
     liveMatches = dataFromSofaScore.data.events;
     let newSize = liveMatches.length;
