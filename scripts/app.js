@@ -43,16 +43,9 @@ async function getLiveMatches(){
         At each call to this function it will do a get req and update liveMatches array.
     */
 
-    const objConfig = {
-        headers: {
-            "Origin": "*",
-            "x-requested-with": "*"
-        }
-    };
-
     const url = "https://aqueous-beyond-63044.herokuapp.com/https://api.sofascore.com/api/v1/sport/football/events/live";
     
-    const dataFromSofaScore = await axios.get(url, objConfig);
+    const dataFromSofaScore = await axios.get(url);
     let oldSize = liveMatches.length;
     liveMatches = dataFromSofaScore.data.events;
     let newSize = liveMatches.length;
