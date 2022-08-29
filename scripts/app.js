@@ -17,15 +17,20 @@ let liveResultsH2 = []; // list of 'h2', each 'h2' saves the match live result, 
 let liveMatches = [];
 let my_index = 0; // reference to where I am at 'liveMatches' array, used to print 10 graphs at each iteration
 
-// axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
-// axios.defaults.headers.get['Access-Control-Allow-Origin'] = '*';
-axios.defaults.headers.post['Content-Type'] ='application/x-www-form-urlencoded';
-axios.defaults.headers.get['Content-Type'] ='application/x-www-form-urlencoded';
-
 loadMoreBtn.addEventListener("click", (evt) => {
     evt.preventDefault();
     createLiveMatchesFrames(); // loads +10 live matches.
 })
+
+function selectDiv(evt){
+    evt.preventDefault();
+    let clickedDiv = evt.target;
+    if(clickedDiv.classList.contains("matchContainer")){
+        clickedDiv.classList.toggle("divSelected");
+    }
+}
+
+document.addEventListener("click", selectDiv);
 
 function addNewMatchesMsg(){
     console.log("New matches just started, update the page!");
@@ -45,7 +50,7 @@ async function getLiveMatches(){
         }
     };
 
-    const url = "http://0.0.0.0:8080/https://api.sofascore.com/api/v1/sport/football/events/live";
+    const url = "https://0.0.0.0:8080/https://api.sofascore.com/api/v1/sport/football/events/live";
     
     const dataFromSofaScore = await axios.get(url, objConfig);
     let oldSize = liveMatches.length;
@@ -73,7 +78,7 @@ function createIframeElementFor(matchID){
 
     const iframeElement = document.createElement('iframe');
     const srcAtt = `https://www.sofascore.com/event/${matchID}/attack-momentum/embed`;
-    iframeElement.setAttribute("width", "95%");
+    iframeElement.setAttribute("width", "100%");
     iframeElement.setAttribute("height", "206");
     iframeElement.setAttribute("src", srcAtt);
     iframeElement.setAttribute("frameborder", "0");

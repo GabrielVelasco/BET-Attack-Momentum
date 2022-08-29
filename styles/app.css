@@ -1,9 +1,11 @@
 .mainContainer {
+    /* background-size: cover; */
+    /* height: 100vh; */
     display: flex;
-    flex-wrap: wrap;
-    justify-content: left;
+    justify-content: center;
     align-items: center;
-    margin: auto;
+    flex-wrap: wrap;
+
     /* border-style: solid; */
 }
 
@@ -12,13 +14,17 @@
 }
 
 .matchContainer {
-    border-style: double;
+    display:grid;
+    justify-content: center;
+    position: relative;
+    margin: 10px;
     border-radius: 10px;
-    margin: 15px;
-    padding-left: 10px;
-    width: 422px;
+    border-style: double;
+    border-color: rgb(204, 204, 204);
+    background-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 5px 5px 30px rgba(255, 255, 255, 0.4);
     height: 250px;
-    background-color: white;
+    width: 400px;
 }
 
 .footer {
@@ -40,7 +46,14 @@ h2 {
 }
 
 body {
-    background-color:azure;
+    background-size: cover;
+    height: 100vh;
+
     /* just a tests */
-    /* background-image: url("https://epostalnews.com/wallpaper/wallpaper/20220822/4k-minimalist-grey-wallpapers-wallpaper-preview.webp"); */
+    background-image: url("https://epostalnews.com/wallpaper/wallpaper/20220822/4k-minimalist-grey-wallpapers-wallpaper-preview.webp");
+}
+
+.divSelected {
+    background-color: #D6EEEE;
+    box-shadow: 5px 5px 30px rgba(255, 255, 255, 0.8);
 }
