@@ -45,7 +45,7 @@ async function getLiveMatches(){
 
     const url = "https://aqueous-beyond-63044.herokuapp.com/https://api.sofascore.com/api/v1/sport/football/events/live";
     
-    const dataFromSofaScore = await axios.get(url);
+    const dataFromSofaScore = await axios.get(url, {headers: {"origin": "*", "x-requested-with": "*"}});
     let oldSize = liveMatches.length;
     liveMatches = dataFromSofaScore.data.events;
     let newSize = liveMatches.length;
