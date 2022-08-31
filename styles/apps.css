@@ -29,7 +29,7 @@
 }
 
 .footer {
-    display: flex;
+    display: grid;
     justify-content: center;
     align-items: center;
     margin: 50px;
@@ -55,7 +55,18 @@ body {
     /* background-image: url("https://epostalnews.com/wallpaper/wallpaper/20220822/4k-minimalist-grey-wallpapers-wallpaper-preview.webp"); */
 }
 
+button {
+    margin-bottom: 20px;
+}
+
 .divSelected {
     background-color: #D6EEEE;
     box-shadow: 5px 5px 30px rgba(72, 71, 71, 0.8);
+}
+
+.github {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
 }
