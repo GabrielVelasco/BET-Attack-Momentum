@@ -1,0 +1,30 @@
+{
+  "name": "attack-momentum",
+  "version": "0.1.0",
+  "description": "A Web Site that gather all football live matches pressure graphs/score from SofaScore.",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GabrielVelasco/BET-Attack-Momentum.git"
+  },
+  "keywords": [
+    "sofascore",
+    "bet",
+    "soccer",
+    "bettors",
+    "corners",
+    "cantos",
+    "escanteios",
+    "apostas",
+    "cornerprobet"
+  ],
+  "author": "Gabriel Velasco",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/GabrielVelasco/BET-Attack-Momentum/issues"
+  },
+  "homepage": "https://github.com/GabrielVelasco/BET-Attack-Momentum#readme"
+}
