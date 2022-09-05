@@ -68,3 +68,15 @@ button {
     align-items: center;
     margin-bottom: 20px;
 }
+
+.ad {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: rgb(184, 15, 15);
+    font-size: 20px;
+}
+
+b {
+    color: rgb(0, 0, 0);
+}
