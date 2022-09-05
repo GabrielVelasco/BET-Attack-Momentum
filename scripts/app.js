@@ -1,13 +1,10 @@
 /*
         WORKING ON: 
-    improving CSS
+    
 
         TODO:
-    solve "has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource."
-    so it will work at github pages
-
     add League selector (show only La Liga/Premier League... matches)
-    improve CSS
+    improve and add page styles
 */
 
 const loadMoreBtn = document.querySelector("#loadMore");
@@ -229,7 +226,7 @@ async function main(){
         await getLiveMatches();
         createLiveMatchesFrames();
         updateScores();
-        setInterval(updateScores, 5000);
+        setInterval(updateScores, 10000);
         
     }catch (e){
         console.log(e);
