@@ -49,10 +49,7 @@ h2 {
 body {
     background-size: cover;
     height: 100vh;
-
-    /* just a tests */
     background-color: rgb(255, 255, 255);
-    /* background-image: url("https://epostalnews.com/wallpaper/wallpaper/20220822/4k-minimalist-grey-wallpapers-wallpaper-preview.webp"); */
 }
 
 button {
@@ -61,7 +58,8 @@ button {
 
 .divSelected {
     background-color: #D6EEEE;
-    box-shadow: 5px 5px 30px rgba(72, 71, 71, 0.8);
+    box-shadow: 0px 5px 5px rgba(72, 71, 71, 0.8);
+    margin-bottom: 30px;
 }
 
 .github {

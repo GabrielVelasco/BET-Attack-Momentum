@@ -10,20 +10,28 @@
 const loadMoreBtn = document.querySelector("#loadMore");
 const newMatchesMsg = document.querySelector("#newMatchesMsg");
 const mainCont = document.querySelector(".mainContainer");
-let liveResultsH2 = []; // list of 'h2', each 'h2' saves the match live result, attr 'id' is a reference to a matchID
+let listOfH2 = []; // list of 'h2', each 'h2' saves the match live result, attr 'id' is a reference to a matchID
 let liveMatches = [];
 let my_index = 0; // reference to where I am at 'liveMatches' array, used to print 10 graphs at each iteration
+
+function isEqual(a, b){
+    return a === b;
+}
 
 loadMoreBtn.addEventListener("click", (evt) => {
     evt.preventDefault();
     createLiveMatchesFrames(); // loads +10 live matches.
 })
 
+function clickedMatchContainer(clickTarget){
+    return clickTarget.classList.contains("matchContainer");
+}
+
 function selectDiv(evt){
     evt.preventDefault();
-    let clickedDiv = evt.target;
-    if(clickedDiv.classList.contains("matchContainer")){
-        clickedDiv.classList.toggle("divSelected");
+    let clickedTarget = evt.target;
+    if(clickedMatchContainer(clickedTarget)){
+        clickedTarget.classList.toggle("divSelected");
     }
 }
 
@@ -75,10 +83,6 @@ function createIframeElementFor(matchID){
     iframeElement.setAttribute("scrolling", "no");
 
     return iframeElement;
-}
-
-function isEqual(a, b){
-    return a === b;
 }
 
 function inProgress(matchID){
@@ -136,7 +140,7 @@ async function updateScores(){
         addNoLiveMatchesMsg();
     }
 
-    for(let h2 of liveResultsH2){
+    for(let h2 of listOfH2){
         let matchID = h2.getAttribute("id");
         let oldScore = h2.innerText;
         if(inProgress(Number(matchID))){
@@ -174,7 +178,7 @@ function createGraphPressureDivFor(matchID){
     const matchLiveResultH2 = document.createElement('h2');
     matchLiveResultH2.setAttribute("id", matchID);
 
-    liveResultsH2.push(matchLiveResultH2); // add to list of 'h2'
+    listOfH2.push(matchLiveResultH2); // add to list of 'h2'
     div.appendChild(matchLiveResultH2);
     div.appendChild(iframeElement);
 
