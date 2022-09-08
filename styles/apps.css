@@ -59,13 +59,13 @@ button {
 .divSelected {
     background-color: #D6EEEE;
     box-shadow: 0px 5px 5px rgba(72, 71, 71, 0.8);
-    margin-bottom: 30px;
 }
 
 .github {
     display: flex;
     justify-content: center;
     align-items: center;
+    font-size: 25px;
     margin-bottom: 20px;
 }
 
@@ -73,10 +73,36 @@ button {
     display: flex;
     justify-content: center;
     align-items: center;
-    color: rgb(184, 15, 15);
+    color: rgb(0, 0, 0);
+    background-color: orange;
     font-size: 20px;
+    border-radius: 15px;
 }
 
-b {
-    color: rgb(0, 0, 0);
+#adPrice {
+    color: rgb(0, 255, 0);
+}
+
+#betano:link, #betano:visited {
+    background-color: #f44336;
+    color: rgb(2, 2, 2);
+    font-weight: 700;
+    padding: 8px 25px; /* more at the sides */
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 5px;
+}
+  
+#betano:hover, #betano:active {
+    background-color: red;
+}
+
+#loadMore {
+    padding: 8px 25px;
+    border-radius: 5px;
+}
+
+.footer a {
+    text-decoration: none;
 }
