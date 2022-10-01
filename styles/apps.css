@@ -69,16 +69,6 @@ button {
     margin-bottom: 20px;
 }
 
-.ad {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: rgb(0, 0, 0);
-    background-color: orange;
-    font-size: 20px;
-    border-radius: 15px;
-}
-
 #adPrice {
     color: rgb(0, 255, 0);
 }
