@@ -48,7 +48,7 @@ async function getLiveMatches(){
         At each call to this function it will do a get req and update liveMatches array.
     */
 
-    const url = "https://aqueous-beyond-63044.herokuapp.com/livegames";
+    const url = "https://fierce-savannah-14331.herokuapp.com/livegames";
     
     const dataFromSofaScore = await axios.get(url);
     let oldSize = liveMatches.length;
