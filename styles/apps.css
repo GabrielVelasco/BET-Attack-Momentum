@@ -35,6 +35,24 @@
     margin: 50px;
 }
 
+.obs {
+    display: grid;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.obs > div {
+    border-radius: 10px;
+    border-style: solid;
+    border-color: rgb(204, 204, 204);
+    padding-right: 20px;
+}
+
+.obs p {
+    text-align: center;
+}
+
 #newMatchesMsg{
     color:brown;
 }
@@ -53,7 +71,22 @@ body {
 }
 
 button {
-    margin-bottom: 20px;
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #3498db;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+    margin-bottom: 15px;
+}
+
+button:hover {
+    background-color: #2980b9;
 }
 
 .divSelected {
@@ -65,7 +98,7 @@ button {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 25px;
+    font-size: 15px;
     margin-bottom: 20px;
 }
 

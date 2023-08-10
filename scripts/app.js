@@ -23,15 +23,15 @@ loadMoreBtn.addEventListener("click", (evt) => {
     createLiveMatchesFrames(); // loads +10 live matches.
 })
 
-function clickedMatchContainer(clickTarget){
+function matchContainerIsClickTarget(clickTarget){
     return clickTarget.classList.contains("matchContainer");
 }
 
 function selectDiv(evt){
     evt.preventDefault();
     let clickedTarget = evt.target;
-    if(clickedMatchContainer(clickedTarget)){
-        clickedTarget.classList.toggle("divSelected");
+    if(matchContainerIsClickTarget(clickedTarget)){
+        clickedTarget.classList.toggle("divSelected"); // select
     }
 }
 
