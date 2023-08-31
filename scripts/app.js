@@ -48,11 +48,11 @@ async function getLiveMatches(){
         At each call to this function it will do a get req and update liveMatches array.
     */
 
-    const url = "https://fierce-savannah-14331.herokuapp.com/livegames";
+    const url = "https://api.sofascore.com/api/v1/sport/football/events/live";
     
     const dataFromSofaScore = await axios.get(url);
     let oldSize = liveMatches.length;
-    liveMatches = dataFromSofaScore.data;
+    liveMatches = dataFromSofaScore.data.events;
     let newSize = liveMatches.length;
 
     if(newSize > oldSize && oldSize != 0){  // check for new matches
