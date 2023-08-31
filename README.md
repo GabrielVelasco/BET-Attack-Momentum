@@ -5,6 +5,9 @@ This project have been discontinued!
 
 A Web Site that gather all football live matches pressure graphs/score from SofaScore.
 
+## preview
+![Image Preview](https://raw.githubusercontent.com/GabrielVelasco/BET-Attack-Momentum/main/imgs/preview.png)
+
 ## Purpose
 Help users to decide which match to watch / bet.
 Help bettors to find a match good for goal/corners based on the pressure graphs (SofaScore attack momentum graph).]
