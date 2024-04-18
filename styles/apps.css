@@ -16,7 +16,7 @@
 
 .matchContainer {
     display:grid;
-    justify-content: center;
+    /* justify-content: center;*/
     position: relative;
     margin: 10px;
     border-radius: 10px;
@@ -26,6 +26,10 @@
     box-shadow: 5px 5px 30px rgba(72, 71, 71, 0.4);
     height: 250px;
     width: 400px;
+}
+
+.matchContainer h2 {
+    text-align: center;
 }
 
 .footer {
