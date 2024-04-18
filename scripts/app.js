@@ -23,15 +23,15 @@ loadMoreBtn.addEventListener("click", (evt) => {
     createLiveMatchesFrames(); // loads +10 live matches.
 })
 
-function matchContainerIsClickTarget(clickTarget){
-    return clickTarget.classList.contains("matchContainer");
+function overlapingDivClicked(target){
+    return target.classList.contains("overlapingDiv");
 }
 
 function selectDiv(evt){
     evt.preventDefault();
-    let clickedTarget = evt.target;
-    if(matchContainerIsClickTarget(clickedTarget)){
-        clickedTarget.classList.toggle("divSelected"); // select
+    let clikedElement = evt.target;
+    if(overlapingDivClicked(clikedElement)){
+        clikedElement.parentElement.classList.toggle("divSelected");
     }
 }
 
@@ -170,17 +170,22 @@ function createGraphPressureDivFor(matchID){
             matchID = ID of a live match
     */
 
-    const iframeElement = createIframeElementFor(matchID);
-
     const div = document.createElement('div');
     div.classList.add("matchContainer");
+
+    const iframeElement = createIframeElementFor(matchID);
 
     const matchLiveResultH2 = document.createElement('h2');
     matchLiveResultH2.setAttribute("id", matchID);
 
     listOfH2.push(matchLiveResultH2); // add to list of 'h2'
+
+    const overlapingDiv =document.createElement('div');
+    overlapingDiv.classList.add("overlapingDiv");
+
     div.appendChild(matchLiveResultH2);
     div.appendChild(iframeElement);
+    div.appendChild(overlapingDiv);
 
     mainCont.appendChild(div);
 }
