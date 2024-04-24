@@ -1,8 +1,12 @@
 /*
-        WORKING ON: 
-    
+    1. get live matches from sofascore
+    2. for each live match, create a div that contains the graph pressure and the live result of the match
+    3. update the live result of the match every 10 seconds
+    4. add a button to remove the div of the match
 
-        TODO:
+    WORKING ON: 
+
+    TODO:
     add League selector (show only La Liga/Premier League... matches)
     improve and add page styles
 */
@@ -163,31 +167,38 @@ async function updateScores(){
 
 function createGraphPressureDivFor(matchID){
     /*
-        Create a single div (that contains the graph pressure and the match live result) 
-        for this matchID and append to main container. 
+        Create a single div (matchContainer) that contains the graph pressure and the match live result for this matchID and append to main container. 
 
         args:
             matchID = ID of a live match
     */
 
-    const div = document.createElement('div');
-    div.classList.add("matchContainer");
+    const matchContainer = document.createElement('div');
+    matchContainer.classList.add("matchContainer");
 
     const iframeElement = createIframeElementFor(matchID);
 
     const matchLiveResultH2 = document.createElement('h2');
     matchLiveResultH2.setAttribute("id", matchID);
 
-    listOfH2.push(matchLiveResultH2); // add to list of 'h2'
+    listOfH2.push(matchLiveResultH2); // add to list of 'h2' (keep track of them, to update the live result)
 
     const overlapingDiv =document.createElement('div');
+    const button = document.createElement('button');
+
+    button.innerText = "X";
+    overlapingDiv.appendChild(button);
+    button.addEventListener("click", (evt) => {
+        evt.preventDefault();
+        matchContainer.remove();
+    });
     overlapingDiv.classList.add("overlapingDiv");
 
-    div.appendChild(matchLiveResultH2);
-    div.appendChild(iframeElement);
-    div.appendChild(overlapingDiv);
-
-    mainCont.appendChild(div);
+    matchContainer.appendChild(overlapingDiv);
+    matchContainer.appendChild(matchLiveResultH2);
+    matchContainer.appendChild(iframeElement);
+    
+    mainCont.appendChild(matchContainer);
 }
 
 function getMatchID(){
