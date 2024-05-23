@@ -60,14 +60,23 @@
 }
 
 .obs > div {
-    border-radius: 10px;
+    /* border-radius: 10px;
     border-style: solid;
-    border-color: rgb(204, 204, 204);
+    border-color: rgb(204, 204, 204); */
     padding-right: 20px;
 }
 
 .obs p {
     text-align: center;
+}
+
+hr {
+    border: 0;
+    height: 1px;
+    width: 80%;
+    background: #333;
+    background-image: linear-gradient(to right, #ccc, #333, #ccc);
+
 }
 
 #newMatchesMsg{
