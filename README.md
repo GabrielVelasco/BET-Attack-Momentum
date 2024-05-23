@@ -1,7 +1,7 @@
 ========>  https://gabrielvelasco.github.io/BET-Attack-Momentum/ <========
 
 # Football Attack Momentum
-This project have been discontinued!
+Feel free to contribute to this project. I'm open to suggestions and improvements (which this project needs).
 
 A Web Site that gather all football live matches pressure graphs/score from SofaScore.
 
