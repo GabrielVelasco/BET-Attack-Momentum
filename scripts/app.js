@@ -52,7 +52,7 @@ async function getLiveMatches(){
         At each call to this function it will do a get req and update liveMatches array.
     */
 
-    const url = "https://api.sofascore.com/api/v1/sport/football/events/live";
+    const url = "https://www.sofascore.com/api/v1/sport/football/events/live";
     
     const dataFromSofaScore = await axios.get(url);
     let oldSize = liveMatches.length;
@@ -62,10 +62,6 @@ async function getLiveMatches(){
     if(newSize > oldSize && oldSize != 0){  // check for new matches
         addNewMatchesMsg();
     }
-
-    let simulateNoLiveMatches = false;  // for testing purposes
-    if(simulateNoLiveMatches)
-        liveMatches = [];  
     
     if(liveMatches.length === 0)
         throw "No live matches at the momment!";
@@ -79,19 +75,19 @@ function createIframeElementFor(matchID){
     */
 
     const iframeElement = document.createElement('iframe');
-    const srcAtt = `https://www.sofascore.com/event/${matchID}/attack-momentum/embed`;
+    const srcAtt = `https://widgets.sofascore.com/embed/attackMomentum?id=${matchID}&widgetBackground=Gray&v=2`;
+    iframeElement.setAttribute("src", srcAtt);
     iframeElement.setAttribute("width", "100%");
     iframeElement.setAttribute("height", "206");
-    iframeElement.setAttribute("src", srcAtt);
     iframeElement.setAttribute("frameborder", "0");
     iframeElement.setAttribute("scrolling", "no");
 
     return iframeElement;
 }
 
-function inProgress(matchID){
+function isInLiveMatches(matchID){
     /*
-        Given an matchID, checks if this match is in progress, if match exists at 'liveMatches', then it's in progress.
+        Given an matchID, checks if this match is in progress (if match exists at 'liveMatches', then it's in progress).
     */
 
     for(let match of liveMatches){
@@ -145,10 +141,10 @@ async function updateScores(){
     }
 
     for(let h2 of listOfH2){
-        let matchID = h2.getAttribute("id");
+        let matchID = Number(h2.getAttribute("id"));
         let oldScore = h2.innerText;
-        if(inProgress(Number(matchID))){
-            let newScore = getLiveResultFor(Number(matchID));
+        if(isInLiveMatches(matchID)){
+            let newScore = getLiveResultFor(matchID);
 
             if(!isEqual(newScore, oldScore)){
                 // update to new score
