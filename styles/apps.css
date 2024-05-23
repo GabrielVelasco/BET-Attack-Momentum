@@ -1,13 +1,9 @@
 
 .mainContainer {
-    /* background-size: cover; */
-    /* height: 100vh; */
     display: flex;
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
-
-    /* border-style: solid; */
 }
 
 .matchContainer:hover {
@@ -22,9 +18,9 @@
     border-radius: 10px;
     border-color: rgb(204, 204, 204);
     /* background-color: rgba(255, 255, 255, 0.1); */
-    box-shadow: 5px 5px 30px rgba(72, 71, 71, 0.4);
+    box-shadow: 2px 2px 15px rgba(72, 71, 71, 0.24);
     height: 250px;
-    width: 400px;
+    width: 475px;
 }
 
 .overlapingDiv {
