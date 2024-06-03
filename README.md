@@ -10,7 +10,7 @@ A Web Site that gather all football live matches pressure graphs/score from Sofa
 
 ## Purpose
 Help users to decide which match to watch / bet.
-Help bettors to find a match good for goal/corners based on the pressure graphs (SofaScore attack momentum graph).]
+Help bettors to find a good match for goal/corners based on the pressure graphs (SofaScore attack momentum graph).]
 
 ## Frameworks/Programs/APIs used
 
