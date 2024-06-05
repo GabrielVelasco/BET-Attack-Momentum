@@ -11,8 +11,6 @@
     improve and add page styles
 */
 
-const loadMoreBtn = document.querySelector("#loadMore");
-const newMatchesMsg = document.querySelector("#newMatchesMsg");
 const mainCont = document.querySelector(".mainContainer");
 let draggedElement = null;
 
@@ -136,30 +134,31 @@ async function updateScores(){
 
     try{
         await getLiveMatches(); // update 'liveMatches'
+
+        for(let h2 of liveScoreBoards){
+            let matchID = Number(h2.getAttribute("id"));
+            let oldScore = h2.innerText;
+            if(isInLiveMatches(matchID)){
+                let newScore = getLiveResultFor(matchID);
+    
+                if(!isEqual(newScore, oldScore)){
+                    // update to new score
+                    h2.innerText = newScore;
+                }
+    
+            }else{
+                // match ended
+                if(h2.innerText.search("ENDED") === -1) // add 'ENDED` to the h2 only once
+                    h2.innerText = h2.innerText + " [ENDED]";
+            }
+        }
+    
+        console.log("Live results updated!");
+
     }catch(e){
         console.log(e);
-        addNoLiveMatchesMsg();
+        alert('No live matches at the moment!');
     }
-
-    for(let h2 of liveScoreBoards){
-        let matchID = Number(h2.getAttribute("id"));
-        let oldScore = h2.innerText;
-        if(isInLiveMatches(matchID)){
-            let newScore = getLiveResultFor(matchID);
-
-            if(!isEqual(newScore, oldScore)){
-                // update to new score
-                h2.innerText = newScore;
-            }
-
-        }else{
-            // match ended
-            if(h2.innerText.search("ENDED") === -1) // add 'ENDED` to the h2 only once
-                h2.innerText = h2.innerText + " [ENDED]";
-        }
-    }
-
-    console.log("Live results updated!");
 }
 
 // Drag and Drop functions
@@ -270,8 +269,10 @@ function createLiveMatchesFrames(){
 
     let numbOfGraphs = 10;
     while(numbOfGraphs--){
-        if(noMoreLiveMatches())
+        if(noMoreLiveMatches()){
+            alert('No more live matches!');
             break;
+        }
 
         let matchID = getMatchID();
         my_index ++;
@@ -279,20 +280,7 @@ function createLiveMatchesFrames(){
     }
 }
 
-function addNoLiveMatchesMsg(){
-    // clear mainContainer?
-
-    const msg = document.createElement('h1');
-    msg.style.color = "brown";
-    msg.innerText = "No live matches at the moment!";
-
-    mainCont.appendChild(msg);
-    mainCont.setAttribute("style", "justify-content: center;");
-}
-
 async function main(){
-    newMatchesMsg.style.display = "none";
-
     try{
         // do request, build array of matches, for each match extract match id and build iframe..
         await getLiveMatches();
@@ -302,7 +290,7 @@ async function main(){
         
     }catch (e){
         console.log(e);
-        addNoLiveMatchesMsg();
+        alert('No live matches at the moment!');
     }
 }
 
