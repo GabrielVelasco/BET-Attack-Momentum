@@ -227,9 +227,9 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function createGraphPressureDivForMatch(matchID) {
-    const matchContainer = document.createElement('div');
-    matchContainer.classList.add("matchContainer");
-    matchContainer.setAttribute('draggable', 'true'); // Make it draggable
+    const gameCard = document.createElement('div');
+    gameCard.classList.add("matchContainer");
+    gameCard.setAttribute('draggable', 'true'); // Make it draggable
 
     const iframeElement = createIframeElementFor(matchID);
 
@@ -241,18 +241,18 @@ function createGraphPressureDivForMatch(matchID) {
     const button = document.createElement('button');
     button.innerText = "X";
 
-    matchContainer.appendChild(matchLiveResultH2);
-    matchContainer.appendChild(iframeElement);
+    gameCard.appendChild(matchLiveResultH2);
+    gameCard.appendChild(iframeElement);
 
     const btnDiv = document.createElement('div');
     btnDiv.classList.add("btnDiv");
     btnDiv.appendChild(button);
 
-    matchContainer.appendChild(btnDiv);
+    gameCard.appendChild(btnDiv);
     
-    mainCont.appendChild(matchContainer);
+    mainCont.appendChild(gameCard);
     
-    addDragAndDropHandlers(matchContainer); // Apply drag,drog handlers to the new card
+    addDragAndDropHandlers(gameCard); // Apply drag,drog handlers to the new card
 }
 
 function getMatchID(){
