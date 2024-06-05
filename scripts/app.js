@@ -35,7 +35,11 @@ function btnDivClicked(target){
     return target.classList.contains("btnDiv");
 }
 
-function checkClieckEvent(evt){
+function closeBtnClicked(target){
+    return target.innerText === "X";
+}
+
+function handleClickEvent(evt){
     evt.preventDefault();
 
     let clikedElement = evt.target;
@@ -46,11 +50,14 @@ function checkClieckEvent(evt){
         clikedElement.parentElement.classList.toggle("divSelected");
 
     }else if(loadMoreBtnClicked(clikedElement)){
-        createLiveMatchesFrames(); // loads +10 live matches.
+        createGameCards(); // loads +10 live matches.
+
+    }else if(closeBtnClicked(clikedElement)){
+        clikedElement.parentElement.parentElement.remove(); // remove the specific matchContainer div
     }
 }
 
-document.addEventListener("click", checkClieckEvent);
+document.addEventListener("click", handleClickEvent);
 
 async function getLiveMatches(){
     /*
@@ -233,10 +240,6 @@ function createGraphPressureDivForMatch(matchID) {
 
     const button = document.createElement('button');
     button.innerText = "X";
-    button.addEventListener("click", (evt) => {
-        evt.preventDefault();
-        matchContainer.remove();
-    });
 
     matchContainer.appendChild(matchLiveResultH2);
     matchContainer.appendChild(iframeElement);
@@ -249,7 +252,7 @@ function createGraphPressureDivForMatch(matchID) {
     
     mainCont.appendChild(matchContainer);
     
-    addDragAndDropHandlers(matchContainer); // Apply handlers to the new element
+    addDragAndDropHandlers(matchContainer); // Apply drag,drog handlers to the new card
 }
 
 function getMatchID(){
@@ -261,7 +264,7 @@ function noMoreLiveMatches(){
     return my_index === liveMatches.length;
 }
 
-function createLiveMatchesFrames(){
+function createGameCards(){
     /*
         At each call to this function it will create +10 graph pressures
         Creating all graph pressures at once makes it kinda slow.
@@ -284,7 +287,7 @@ async function main(){
     try{
         // do request, build array of matches, for each match extract match id and build iframe..
         await getLiveMatches();
-        createLiveMatchesFrames();
+        createGameCards();
         updateScores();
         setInterval(updateScores, 5000);
         
