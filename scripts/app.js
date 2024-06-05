@@ -24,10 +24,9 @@ function isEqual(a, b){
     return a === b;
 }
 
-loadMoreBtn.addEventListener("click", (evt) => {
-    evt.preventDefault();
-    createLiveMatchesFrames(); // loads +10 live matches.
-})
+function loadMoreBtnClicked(target){
+    return target.id === "loadMore";
+}
 
 function matchContainerClicked(target){
     return target.classList.contains("matchContainer");
@@ -37,20 +36,22 @@ function btnDivClicked(target){
     return target.classList.contains("btnDiv");
 }
 
-function selectDiv(evt){
+function checkClieckEvent(evt){
     evt.preventDefault();
 
     let clikedElement = evt.target;
     if(matchContainerClicked(clikedElement)){
         clikedElement.classList.toggle("divSelected");
-    }
 
-    if(btnDivClicked(clikedElement)){
+    }else if(btnDivClicked(clikedElement)){
         clikedElement.parentElement.classList.toggle("divSelected");
+
+    }else if(loadMoreBtnClicked(clikedElement)){
+        createLiveMatchesFrames(); // loads +10 live matches.
     }
 }
 
-document.addEventListener("click", selectDiv);
+document.addEventListener("click", checkClieckEvent);
 
 function addNewMatchesMsg(){
     console.log("New matches just started, update the page!");
