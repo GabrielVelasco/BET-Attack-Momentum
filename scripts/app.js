@@ -14,6 +14,7 @@
 const loadMoreBtn = document.querySelector("#loadMore");
 const newMatchesMsg = document.querySelector("#newMatchesMsg");
 const mainCont = document.querySelector(".mainContainer");
+let draggedElement = null;
 
 // list of 'h2', each 'h2' saves the match live result, attr 'id' is a reference to a matchID. To update the live result of the match, iterate over this list and call getLiveResultFor(id)
 let liveScoreBoards = []; 
@@ -53,12 +54,6 @@ function checkClieckEvent(evt){
 
 document.addEventListener("click", checkClieckEvent);
 
-function addNewMatchesMsg(){
-    console.log("New matches just started, update the page!");
-    if(newMatchesMsg.style.display === "none")
-        newMatchesMsg.style.display = "block";
-}
-
 async function getLiveMatches(){
     /*
         At each call to this function it will do a get req and update liveMatches array.
@@ -70,10 +65,6 @@ async function getLiveMatches(){
     let oldSize = liveMatches.length;
     liveMatches = dataFromSofaScore.data.events;
     let newSize = liveMatches.length;
-
-    // if(newSize > oldSize && oldSize != 0){  // check for new matches
-    //     addNewMatchesMsg();
-    // }
     
     if(liveMatches.length === 0)
         throw "No live matches at the momment!";
@@ -171,16 +162,68 @@ async function updateScores(){
     console.log("Live results updated!");
 }
 
-function createGraphPressureDivForMatch(matchID){
-    /*
-        Create a single div (matchContainer) that contains the graph pressure and the match live result for this matchID and append to main container. 
+// Drag and Drop functions
+function handleDragStart(event) {
+    draggedElement = event.target;
+    event.target.style.opacity = "0.5";
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('text/html', event.target.innerHTML);
+}
 
-        args:
-            matchID = ID of a live match
-    */
+function handleDragOver(event) {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+    return false;
+}
 
+function handleDragEnter(event) {
+    if (event.target.classList.contains('matchContainer')) {
+        event.target.classList.add('over');
+    }
+}
+
+function handleDragLeave(event) {
+    if (event.target.classList.contains('matchContainer')) {
+        event.target.classList.remove('over');
+    }
+}
+
+function handleDrop(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    if (draggedElement !== event.target && event.target.classList.contains('matchContainer')) {
+        draggedElement.innerHTML = event.target.innerHTML;
+        event.target.innerHTML = event.dataTransfer.getData('text/html');
+        addDragAndDropHandlers(draggedElement); // Re-apply handlers to new elements
+        addDragAndDropHandlers(event.target);
+    }
+    return false;
+}
+
+function handleDragEnd(event) {
+    event.target.style.opacity = "1.0";
+    document.querySelectorAll('.matchContainer').forEach(item => {
+        item.classList.remove('over');
+    });
+}
+
+function addDragAndDropHandlers(element) {
+    element.addEventListener('dragstart', handleDragStart, false);
+    element.addEventListener('dragenter', handleDragEnter, false);
+    element.addEventListener('dragover', handleDragOver, false);
+    element.addEventListener('dragleave', handleDragLeave, false);
+    element.addEventListener('drop', handleDrop, false);
+    element.addEventListener('dragend', handleDragEnd, false);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll('.matchContainer').forEach(addDragAndDropHandlers);
+});
+
+function createGraphPressureDivForMatch(matchID) {
     const matchContainer = document.createElement('div');
     matchContainer.classList.add("matchContainer");
+    matchContainer.setAttribute('draggable', 'true'); // Make it draggable
 
     const iframeElement = createIframeElementFor(matchID);
 
@@ -189,16 +232,12 @@ function createGraphPressureDivForMatch(matchID){
 
     liveScoreBoards.push(matchLiveResultH2); // add to list of 'h2' (keep track of them, to update the live result)
 
-    //const overlapingDiv =document.createElement('div');
     const button = document.createElement('button');
     button.innerText = "X";
-    //overlapingDiv.appendChild(button);
-
     button.addEventListener("click", (evt) => {
         evt.preventDefault();
         matchContainer.remove();
     });
-    //overlapingDiv.classList.add("overlapingDiv");
 
     matchContainer.appendChild(matchLiveResultH2);
     matchContainer.appendChild(iframeElement);
@@ -210,6 +249,8 @@ function createGraphPressureDivForMatch(matchID){
     matchContainer.appendChild(btnDiv);
     
     mainCont.appendChild(matchContainer);
+    
+    addDragAndDropHandlers(matchContainer); // Apply handlers to the new element
 }
 
 function getMatchID(){

@@ -11,7 +11,7 @@
 }
 
 .matchContainer {
-    display:flex;
+    display: flex;
     justify-content: center;
     align-content: flex-start;
     flex-wrap: wrap;
@@ -19,10 +19,18 @@
     margin: 10px;
     border-radius: 10px;
     border-color: rgb(204, 204, 204);
-    /* background-color: rgba(255, 255, 255, 0.1); */
     box-shadow: 2px 2px 15px rgba(72, 71, 71, 0.24);
     height: 25rem;
     width: 32rem;
+    cursor: grab;
+}
+
+.matchContainer:active {
+    cursor: grabbing;
+}
+
+.matchContainer.over {
+    border: 2px dashed #000;
 }
 
 
@@ -123,25 +131,6 @@ button:hover {
     align-items: center;
     font-size: 15px;
     margin-bottom: 20px;
-}
-
-#adPrice {
-    color: rgb(0, 255, 0);
-}
-
-#betano:link, #betano:visited {
-    background-color: #f44336;
-    color: rgb(2, 2, 2);
-    font-weight: 700;
-    padding: 8px 25px; /* more at the sides */
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    border-radius: 5px;
-}
-  
-#betano:hover, #betano:active {
-    background-color: red;
 }
 
 #loadMore {
