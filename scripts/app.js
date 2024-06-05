@@ -289,7 +289,7 @@ async function main(){
         await getLiveMatches();
         createGameCards();
         updateScores();
-        setInterval(updateScores, 5000);
+        setInterval(updateScores, 1000);
         
     }catch (e){
         console.log(e);
