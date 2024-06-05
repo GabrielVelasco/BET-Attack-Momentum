@@ -14,7 +14,9 @@
 const loadMoreBtn = document.querySelector("#loadMore");
 const newMatchesMsg = document.querySelector("#newMatchesMsg");
 const mainCont = document.querySelector(".mainContainer");
-let listOfH2 = []; // list of 'h2', each 'h2' saves the match live result, attr 'id' is a reference to a matchID
+
+// list of 'h2', each 'h2' saves the match live result, attr 'id' is a reference to a matchID. To update the live result of the match, iterate over this list and call getLiveResultFor(id)
+let liveScoreBoards = []; 
 let liveMatches = [];
 let my_index = 0; // reference to where I am at 'liveMatches' array, used to print 10 graphs at each iteration
 
@@ -27,14 +29,23 @@ loadMoreBtn.addEventListener("click", (evt) => {
     createLiveMatchesFrames(); // loads +10 live matches.
 })
 
-function overlapingDivClicked(target){
-    return target.classList.contains("overlapingDiv");
+function matchContainerClicked(target){
+    return target.classList.contains("matchContainer");
+}
+
+function btnDivClicked(target){
+    return target.classList.contains("btnDiv");
 }
 
 function selectDiv(evt){
     evt.preventDefault();
+
     let clikedElement = evt.target;
-    if(overlapingDivClicked(clikedElement)){
+    if(matchContainerClicked(clikedElement)){
+        clikedElement.classList.toggle("divSelected");
+    }
+
+    if(btnDivClicked(clikedElement)){
         clikedElement.parentElement.classList.toggle("divSelected");
     }
 }
@@ -59,9 +70,9 @@ async function getLiveMatches(){
     liveMatches = dataFromSofaScore.data.events;
     let newSize = liveMatches.length;
 
-    if(newSize > oldSize && oldSize != 0){  // check for new matches
-        addNewMatchesMsg();
-    }
+    // if(newSize > oldSize && oldSize != 0){  // check for new matches
+    //     addNewMatchesMsg();
+    // }
     
     if(liveMatches.length === 0)
         throw "No live matches at the momment!";
@@ -75,10 +86,8 @@ function createIframeElementFor(matchID){
     */
 
     const iframeElement = document.createElement('iframe');
-    const srcAtt = `https://widgets.sofascore.com/embed/attackMomentum?id=${matchID}&widgetBackground=Gray&v=2`;
+    const srcAtt = `https://widgets.sofascore.com/embed/attackMomentum?id=${matchID}&widgetBackground=Gray&v=2`; // url that SofaScore provides...
     iframeElement.setAttribute("src", srcAtt);
-    iframeElement.setAttribute("width", "100%");
-    iframeElement.setAttribute("height", "206");
     iframeElement.setAttribute("frameborder", "0");
     iframeElement.setAttribute("scrolling", "no");
 
@@ -140,7 +149,7 @@ async function updateScores(){
         addNoLiveMatchesMsg();
     }
 
-    for(let h2 of listOfH2){
+    for(let h2 of liveScoreBoards){
         let matchID = Number(h2.getAttribute("id"));
         let oldScore = h2.innerText;
         if(isInLiveMatches(matchID)){
@@ -161,7 +170,7 @@ async function updateScores(){
     console.log("Live results updated!");
 }
 
-function createGraphPressureDivFor(matchID){
+function createGraphPressureDivForMatch(matchID){
     /*
         Create a single div (matchContainer) that contains the graph pressure and the match live result for this matchID and append to main container. 
 
@@ -177,22 +186,27 @@ function createGraphPressureDivFor(matchID){
     const matchLiveResultH2 = document.createElement('h2');
     matchLiveResultH2.setAttribute("id", matchID);
 
-    listOfH2.push(matchLiveResultH2); // add to list of 'h2' (keep track of them, to update the live result)
+    liveScoreBoards.push(matchLiveResultH2); // add to list of 'h2' (keep track of them, to update the live result)
 
-    const overlapingDiv =document.createElement('div');
+    //const overlapingDiv =document.createElement('div');
     const button = document.createElement('button');
-
     button.innerText = "X";
-    overlapingDiv.appendChild(button);
+    //overlapingDiv.appendChild(button);
+
     button.addEventListener("click", (evt) => {
         evt.preventDefault();
         matchContainer.remove();
     });
-    overlapingDiv.classList.add("overlapingDiv");
+    //overlapingDiv.classList.add("overlapingDiv");
 
-    matchContainer.appendChild(overlapingDiv);
     matchContainer.appendChild(matchLiveResultH2);
     matchContainer.appendChild(iframeElement);
+
+    const btnDiv = document.createElement('div');
+    btnDiv.classList.add("btnDiv");
+    btnDiv.appendChild(button);
+
+    matchContainer.appendChild(btnDiv);
     
     mainCont.appendChild(matchContainer);
 }
@@ -219,7 +233,7 @@ function createLiveMatchesFrames(){
 
         let matchID = getMatchID();
         my_index ++;
-        createGraphPressureDivFor(matchID);
+        createGraphPressureDivForMatch(matchID);
     }
 }
 
@@ -242,7 +256,7 @@ async function main(){
         await getLiveMatches();
         createLiveMatchesFrames();
         updateScores();
-        setInterval(updateScores, 10000);
+        setInterval(updateScores, 5000);
         
     }catch (e){
         console.log(e);
