@@ -17,14 +17,9 @@ let draggedElement = null;
 // list of 'h2', each 'h2' saves the match live result, attr 'id' is a reference to a matchID. To update the live result of the match, iterate over this list and call getLiveResultFor(id)
 let liveScoreBoards = []; 
 let liveMatches = [];
-let my_index = 0; // reference to where I am at 'liveMatches' array, used to print 10 graphs at each iteration
 
 function isEqual(a, b){
     return a === b;
-}
-
-function loadMoreBtnClicked(target){
-    return target.id === "loadMore";
 }
 
 function matchContainerClicked(target){
@@ -49,9 +44,6 @@ function handleClickEvent(evt){
     }else if(btnDivClicked(clikedElement)){
         clikedElement.parentElement.classList.toggle("divSelected");
 
-    }else if(loadMoreBtnClicked(clikedElement)){
-        createGameCards(); // loads +10 live matches.
-
     }else if(closeBtnClicked(clikedElement)){
         clikedElement.parentElement.parentElement.remove(); // remove the specific matchContainer div
     }
@@ -67,9 +59,7 @@ async function getLiveMatches(){
     const url = "https://www.sofascore.com/api/v1/sport/football/events/live";
     
     const dataFromSofaScore = await axios.get(url);
-    let oldSize = liveMatches.length;
     liveMatches = dataFromSofaScore.data.events;
-    let newSize = liveMatches.length;
     
     if(liveMatches.length === 0)
         throw "No live matches at the momment!";
@@ -91,28 +81,16 @@ function createIframeElementFor(matchID){
     return iframeElement;
 }
 
-function isInLiveMatches(matchID){
-    /*
-        Given an matchID, checks if this match is in progress (if match exists at 'liveMatches', then it's in progress).
-    */
-
-    for(let match of liveMatches){
-        if(isEqual(match.id, matchID))
-            return true;
-    }
-
-    return false;
-}
-
-function getLiveResultFor(matchID){
+function getLiveScoreboard(matchID){
     /*
         Given an matchID, search for this match at 'liveMatches', get home/away scores
         returns a string with the live score of the match.
+        If match not found at 'liveMatches', returns "false".
 
         args:
             matchID = ID of a live match
         returns:
-            a String containing the live result of the match. Ex: "Home 2 - 1 Away" or "not found" (match not found)
+            a String containing the live result of the match. Ex: "Home 2 - 1 Away" or "ENDED" (match not in 'liveMatches')
     */
 
     let homeScore = 0, awayScore = 0, homeTeamName = "", awayTeamName = "";
@@ -130,7 +108,7 @@ function getLiveResultFor(matchID){
         }
     }
 
-    return "not found";
+    return false;
 }
 
 async function updateScores(){
@@ -145,19 +123,14 @@ async function updateScores(){
         for(let h2 of liveScoreBoards){
             let matchID = Number(h2.getAttribute("id"));
             let oldScore = h2.innerText;
-            if(isInLiveMatches(matchID)){
-                let newScore = getLiveResultFor(matchID);
-    
-                if(!isEqual(newScore, oldScore)){
-                    // update to new score
-                    h2.innerText = newScore;
-                }
-    
-            }else{
-                // match ended
-                if(h2.innerText.search("ENDED") === -1) // add 'ENDED` to the h2 only once
-                    h2.innerText = h2.innerText + " [ENDED]";
-            }
+
+            let newScore = getLiveScoreboard(matchID);
+            if(!newScore){
+                if(oldScore.search('ENDED') === -1)
+                    h2.innerText = oldScore + ' ' + '[ENDED]';
+
+            }else if(!isEqual(oldScore, newScore))
+                h2.innerText = newScore;
         }
     
         console.log("Live results updated!");
@@ -255,31 +228,18 @@ function createGraphPressureDivForMatch(matchID) {
     addDragAndDropHandlers(gameCard); // Apply drag,drog handlers to the new card
 }
 
-function getMatchID(){
-    // returns the current matchID
-    return liveMatches[my_index].id;
-}
-
-function noMoreLiveMatches(){
-    return my_index === liveMatches.length;
+function hasPressureGraph(match){
+    return match.hasEventPlayerHeatMap;
 }
 
 function createGameCards(){
     /*
-        At each call to this function it will create +10 graph pressures
-        Creating all graph pressures at once makes it kinda slow.
+        Create divs for each live match, each div contains the graph pressure and the live result of the match
     */
 
-    let numbOfGraphs = 10;
-    while(numbOfGraphs--){
-        if(noMoreLiveMatches()){
-            alert('No more live matches!');
-            break;
-        }
-
-        let matchID = getMatchID();
-        my_index ++;
-        createGraphPressureDivForMatch(matchID);
+    for(let match of liveMatches){
+        if(hasPressureGraph(match))
+            createGraphPressureDivForMatch(match.id);
     }
 }
 
@@ -289,7 +249,7 @@ async function main(){
         await getLiveMatches();
         createGameCards();
         updateScores();
-        setInterval(updateScores, 1000);
+        setInterval(updateScores, 5000);
         
     }catch (e){
         console.log(e);
