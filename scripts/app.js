@@ -14,11 +14,9 @@
 const mainCont = document.querySelector(".mainContainer");
 let draggedElement = null;
 
-// list of 'h2', each 'h2' saves the match live result, attr 'id' is a reference to a matchID. To update the live result of the match, iterate over this list and call getLiveResultFor(id)
-let liveScoreBoards = []; 
 let liveMatches = [];
 
-function isEqual(a, b){
+function _equal(a, b){
     return a === b;
 }
 
@@ -108,7 +106,7 @@ function getLiveScoreboard(matchID){
         }
     }
 
-    return false;
+    return 'ENDED';
 }
 
 async function updateScores(){
@@ -120,17 +118,19 @@ async function updateScores(){
     try{
         await getLiveMatches(); // update 'liveMatches'
 
-        for(let h2 of liveScoreBoards){
-            let matchID = Number(h2.getAttribute("id"));
-            let oldScore = h2.innerText;
+        let liveScoreBoards = document.querySelectorAll('h2');
+        for(let scoreH2 of liveScoreBoards){
+            let matchID = Number(scoreH2.getAttribute("id"));
+            let oldScore = scoreH2.innerText;
 
             let newScore = getLiveScoreboard(matchID);
-            if(!newScore){
+            if(newScore === 'ENDED'){
                 if(oldScore.search('ENDED') === -1)
-                    h2.innerText = oldScore + ' ' + '[ENDED]';
+                    scoreH2.innerText = oldScore + ' ' + '[ENDED]';
 
-            }else if(!isEqual(oldScore, newScore))
-                h2.innerText = newScore;
+            }else if(!_equal(oldScore, newScore)){
+                scoreH2.innerText = newScore;
+            }
         }
     
         console.log("Live results updated!");
@@ -209,8 +209,6 @@ function createGraphPressureDivForMatch(matchID) {
     const matchLiveResultH2 = document.createElement('h2');
     matchLiveResultH2.setAttribute("id", matchID);
 
-    liveScoreBoards.push(matchLiveResultH2); // add to list of 'h2' (keep track of them, to update the live result)
-
     const button = document.createElement('button');
     button.innerText = "X";
 
@@ -232,7 +230,7 @@ function hasPressureGraph(match){
     return match.hasEventPlayerHeatMap;
 }
 
-function createGameCards(){
+async function createGameCards(){
     /*
         Create divs for each live match, each div contains the graph pressure and the live result of the match
     */
@@ -247,9 +245,9 @@ async function main(){
     try{
         // do request, build array of matches, for each match extract match id and build iframe..
         await getLiveMatches();
-        createGameCards();
+        await createGameCards();
         updateScores();
-        setInterval(updateScores, 5000);
+        setInterval(updateScores, 1000);
         
     }catch (e){
         console.log(e);
