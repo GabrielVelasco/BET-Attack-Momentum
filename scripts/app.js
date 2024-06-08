@@ -227,7 +227,7 @@ function createGraphPressureDivForMatch(matchID) {
 }
 
 function hasPressureGraph(match){
-    return match.hasEventPlayerHeatMap;
+    return match.hasEventPlayerHeatMap || match.hasEventPlayerStatistics;
 }
 
 async function createGameCards(){
@@ -247,7 +247,7 @@ async function main(){
         await getLiveMatches();
         await createGameCards();
         updateScores();
-        setInterval(updateScores, 1000);
+        setInterval(updateScores, 5000);
         
     }catch (e){
         console.log(e);
