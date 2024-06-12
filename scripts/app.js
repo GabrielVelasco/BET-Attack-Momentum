@@ -79,11 +79,11 @@ function createIframeElementFor(matchID){
     return iframeElement;
 }
 
-function getLiveScoreboard(matchID){
+function getLiveScoreboard(matchIdTarget){
     /*
         Given an matchID, search for this match at 'liveMatches', get home/away scores
         returns a string with the live score of the match.
-        If match not found at 'liveMatches', returns "false".
+        If match not found at 'liveMatches', returns "ENDED".
 
         args:
             matchID = ID of a live match
@@ -93,7 +93,7 @@ function getLiveScoreboard(matchID){
 
     let homeScore = 0, awayScore = 0, homeTeamName = "", awayTeamName = "";
     for(let match of liveMatches){
-        if(match.id === matchID){
+        if(match.id === matchIdTarget){
             // match found, get home/away scores
 
             homeTeamName = match.homeTeam.shortName;
