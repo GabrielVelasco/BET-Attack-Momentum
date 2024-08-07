@@ -29,10 +29,14 @@ function btnDivClicked(target){
 }
 
 function closeBtnClicked(target){
-    return target.innerText === "X";
+    return target.classList.contains("closeBtn");
 }
 
-function handleClickEvent(evt){
+function expandBtnClicked(target){
+    return target.classList.contains("dropdownBtn");
+}
+
+document.addEventListener("click", (evt) => {
     evt.preventDefault();
 
     let clikedElement = evt.target;
@@ -44,10 +48,12 @@ function handleClickEvent(evt){
 
     }else if(closeBtnClicked(clikedElement)){
         clikedElement.parentElement.parentElement.remove(); // remove the specific matchContainer div
+    
+    }else if(expandBtnClicked(clikedElement)){
+        clikedElement.classList.toggle('active');
+        clikedElement.nextSibling.classList.toggle('show');
     }
-}
-
-document.addEventListener("click", handleClickEvent);
+});
 
 async function getLiveMatches(){
     /*
@@ -63,6 +69,20 @@ async function getLiveMatches(){
         throw "No live matches at the momment!";
     
     return "array of matches created";
+}
+
+async function getMatchStats(matchID){
+    // GET https://www.sofascore.com/api/v1/event/matchID/statistics
+
+    const url = `https://www.sofascore.com/api/v1/event/${matchID}/statistics`;
+    
+    const dataFromSofaScore = await axios.get(url);
+    let matchSats = dataFromSofaScore.data.statistics[0].groups[0].statisticsItems;
+
+    if(matchSats.length === 0)
+        throw "No stats for this match!";
+
+    return matchSats;
 }
 
 function createIframeElementFor(matchID){
@@ -141,6 +161,49 @@ async function updateScores(){
     }
 }
 
+function updateStats() {
+    /*
+        Update stats for each match
+    */
+
+    let statsDivs = document.querySelectorAll('.statsDiv');
+    for (let statsDiv of statsDivs) {
+        const matchID = statsDiv.id;
+
+        getMatchStats(matchID)
+        .then((stats) => {
+            // stats[0] -> ballPossession, stats[i].home, stats[i].away
+            // stats[1] -> xP goals, stats[1].home -> home team, stats[1].away -> away team
+            // stats[2] -> bigChanceCreated 
+            // stats[3] -> totalShotsOnGoal
+            // stats[5] -> cornerKicks
+            // stats[7] -> passes
+            // stats[i] -> someStatsFromMatch
+            // stats[i].key -> name of the stat (id of respective 'span' element inside homeTeamStatsDiv | awayTeamStatsDiv)
+
+            const homeTeamStatsDiv = statsDiv.querySelector('.homeTeamsStatsDiv');
+            const awayTeamStatsDiv = statsDiv.querySelector('.awayTeamsStatsDiv');
+            
+            for(let s of stats){
+                const statName = s.key;
+                const homeStatSpan = homeTeamStatsDiv.querySelector('#' + statName);
+                const awayStatSpan = awayTeamStatsDiv.querySelector('#' + statName);
+
+                if(homeStatSpan && awayStatSpan){
+                    // if the stat exists, update the value
+                    homeStatSpan.innerText = `${s.home}`;
+                    awayStatSpan.innerText = `${s.away}`;
+                }
+            }
+        })
+        .catch((e) => {
+            console.log(e);
+        });
+    }
+
+    console.log("Stats updated!");
+}
+
 // Drag and Drop functions
 function handleDragStart(event) {
     draggedElement = event.target;
@@ -199,31 +262,114 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll('.matchContainer').forEach(addDragAndDropHandlers);
 });
 
-function createGraphPressureDivForMatch(matchID) {
+///////////////////////////
+
+function createMatchCard(matchID) {
     const gameCard = document.createElement('div');
     gameCard.classList.add("matchContainer");
-    gameCard.setAttribute('draggable', 'true'); // Make it draggable
+    gameCard.setAttribute('draggable', 'true');
 
     const iframeElement = createIframeElementFor(matchID);
 
+    const divForBtnAndScoreboard = document.createElement('div');
+    divForBtnAndScoreboard.classList.add('matchCardHeader');
+
+    const btnRemoveCard = document.createElement('button');
+    btnRemoveCard.classList.add('closeBtn');
+    btnRemoveCard.innerText = "X";
+    divForBtnAndScoreboard.appendChild(btnRemoveCard);
+
     const matchLiveResultH2 = document.createElement('h2');
     matchLiveResultH2.setAttribute("id", matchID);
+    divForBtnAndScoreboard.appendChild(matchLiveResultH2);
 
-    const button = document.createElement('button');
-    button.innerText = "X";
-
-    gameCard.appendChild(matchLiveResultH2);
+    gameCard.appendChild(divForBtnAndScoreboard);
     gameCard.appendChild(iframeElement);
 
-    const btnDiv = document.createElement('div');
-    btnDiv.classList.add("btnDiv");
-    btnDiv.appendChild(button);
+    // add stats for text for home team\
+    const divHomeTeamStats = document.createElement('div');
+    divHomeTeamStats.classList.add('homeTeamsStatsDiv');
 
-    gameCard.appendChild(btnDiv);
-    
+    const ballPossHome = document.createElement('div');
+    const ballPossHomeP = document.createElement('p'); ballPossHomeP.innerText = "Ball Possession"; ballPossHome.appendChild(ballPossHomeP);
+    const ballPossHomeSpan = document.createElement('span'); ballPossHomeSpan.setAttribute('id', 'ballPossession'); ballPossHome.appendChild(ballPossHomeSpan);
+    divHomeTeamStats.appendChild(ballPossHome);
+
+    const xpGoalsHome = document.createElement('div');
+    const xpGoalsHomeP = document.createElement('p'); xpGoalsHomeP.innerText = "xP Goals"; xpGoalsHome.appendChild(xpGoalsHomeP);
+    const xpGoalsHomeSpan = document.createElement('span'); xpGoalsHomeSpan.setAttribute('id', 'xPGoals'); xpGoalsHome.appendChild(xpGoalsHomeSpan);
+    xpGoalsHomeSpan.innerText = "-";
+    divHomeTeamStats.appendChild(xpGoalsHome);
+
+    const bigChancesHome = document.createElement('div');
+    const bigChancesHomeP = document.createElement('p'); bigChancesHomeP.innerText = "Big Chances"; bigChancesHome.appendChild(bigChancesHomeP);
+    const bigChancesHomeSpan = document.createElement('span'); bigChancesHomeSpan.setAttribute('id', 'bigChanceCreated'); bigChancesHome.appendChild(bigChancesHomeSpan);
+    bigChancesHomeSpan.innerText = "-";
+    divHomeTeamStats.appendChild(bigChancesHome);
+
+    const totalShotsHome = document.createElement('div');
+    const totalShotsHomeP = document.createElement('p'); totalShotsHomeP.innerText = "Total Shots"; totalShotsHome.appendChild(totalShotsHomeP);
+    const totalShotsHomeSpan = document.createElement('span'); totalShotsHomeSpan.setAttribute('id', 'totalShotsOnGoal'); totalShotsHome.appendChild(totalShotsHomeSpan);
+    divHomeTeamStats.appendChild(totalShotsHome);
+
+    const cornersHome = document.createElement('div');
+    const cornersHomeP = document.createElement('p'); cornersHomeP.innerText = "Corners"; cornersHome.appendChild(cornersHomeP);
+    const cornersHomeSpan = document.createElement('span'); cornersHomeSpan.setAttribute('id', 'cornerKicks'); cornersHome.appendChild(cornersHomeSpan);
+    divHomeTeamStats.appendChild(cornersHome);
+
+    const passesHome = document.createElement('div');
+    const passesHomeP = document.createElement('p'); passesHomeP.innerText = "Passes"; passesHome.appendChild(passesHomeP);
+    const passesHomeSpan = document.createElement('span'); passesHomeSpan.setAttribute('id', 'passes'); passesHome.appendChild(passesHomeSpan);
+    divHomeTeamStats.appendChild(passesHome);
+
+    // add stats for text for away team
+    const awayHomeTeamStats = document.createElement('div');
+    awayHomeTeamStats.classList.add('awayTeamsStatsDiv');
+
+    const ballPossAway = document.createElement('div');
+    const ballPossAwayP = document.createElement('p'); ballPossAwayP.innerText = "Ball Possession"; ballPossAway.appendChild(ballPossAwayP);
+    const ballPossAwaySpan = document.createElement('span'); ballPossAwaySpan.setAttribute('id', 'ballPossession'); ballPossAway.appendChild(ballPossAwaySpan);
+    awayHomeTeamStats.appendChild(ballPossAway);
+
+    const xpGoalsAway = document.createElement('div');
+    const xpGoalsAwayP = document.createElement('p'); xpGoalsAwayP.innerText = "xP Goals"; xpGoalsAway.appendChild(xpGoalsAwayP);
+    const xpGoalsAwaySpan = document.createElement('span'); xpGoalsAwaySpan.setAttribute('id', 'xPGoals'); xpGoalsAway.appendChild(xpGoalsAwaySpan);
+    xpGoalsAwaySpan.innerText = "-";
+    awayHomeTeamStats.appendChild(xpGoalsAway);
+
+    const bigChancesAway = document.createElement('div');
+    const bigChancesAwayP = document.createElement('p'); bigChancesAwayP.innerText = "Big Chances"; bigChancesAway.appendChild(bigChancesAwayP);
+    const bigChancesAwaySpan = document.createElement('span'); bigChancesAwaySpan.setAttribute('id', 'bigChanceCreated'); bigChancesAway.appendChild(bigChancesAwaySpan);
+    bigChancesAwaySpan.innerText = "-";
+    awayHomeTeamStats.appendChild(bigChancesAway);
+
+    const totalShotsAway = document.createElement('div');
+    const totalShotsAwayP = document.createElement('p'); totalShotsAwayP.innerText = "Total Shots"; totalShotsAway.appendChild(totalShotsAwayP);
+    const totalShotsAwaySpan = document.createElement('span'); totalShotsAwaySpan.setAttribute('id', 'totalShotsOnGoal'); totalShotsAway.appendChild(totalShotsAwaySpan);
+    awayHomeTeamStats.appendChild(totalShotsAway);
+
+    const cornersAway = document.createElement('div');
+    const cornersAwayP = document.createElement('p'); cornersAwayP.innerText = "Corners"; cornersAway.appendChild(cornersAwayP);
+    const cornersAwaySpan = document.createElement('span'); cornersAwaySpan.setAttribute('id', 'cornerKicks'); cornersAway.appendChild(cornersAwaySpan);
+    awayHomeTeamStats.appendChild(cornersAway);
+
+    const passesAway = document.createElement('div');
+    const passesAwayP = document.createElement('p'); passesAwayP.innerText = "Passes"; passesAway.appendChild(passesAwayP);
+    const passesAwaySpan = document.createElement('span'); passesAwaySpan.setAttribute('id', 'passes'); passesAway.appendChild(passesAwaySpan);
+    awayHomeTeamStats.appendChild(passesAway);
+
+    const statsDiv = document.createElement('div');
+    statsDiv.classList.add('statsDiv');
+    statsDiv.setAttribute('id', matchID);
+
+    statsDiv.appendChild(divHomeTeamStats);
+    statsDiv.appendChild(awayHomeTeamStats);
+
+    gameCard.appendChild(statsDiv);
+
     mainCont.appendChild(gameCard);
     
-    addDragAndDropHandlers(gameCard); // Apply drag,drog handlers to the new card
+    addDragAndDropHandlers(gameCard);
 }
 
 function hasPressureGraph(match){
@@ -237,7 +383,7 @@ async function createGameCards(){
 
     for(let match of liveMatches){
         if(hasPressureGraph(match))
-            createGraphPressureDivForMatch(match.id);
+            createMatchCard(match.id);
     }
 }
 
@@ -247,7 +393,9 @@ async function main(){
         await getLiveMatches();
         await createGameCards();
         updateScores();
-        setInterval(updateScores, 5000);
+        updateStats();
+        setInterval(updateScores, 1000);
+        setInterval(updateStats, 30000);
         
     }catch (e){
         console.log(e);

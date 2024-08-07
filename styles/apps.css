@@ -4,6 +4,8 @@
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
+    height: 100%;
+    width: 100%;
 }
 
 .matchContainer:hover {
@@ -15,14 +17,24 @@
     justify-content: center;
     align-content: flex-start;
     flex-wrap: wrap;
-    position: relative;
     margin: 10px;
     border-radius: 10px;
     border-color: rgb(204, 204, 204);
     box-shadow: 2px 2px 15px rgba(72, 71, 71, 0.24);
-    height: 25rem;
-    width: 32rem;
+    height: auto;
+    width: 540px;
     cursor: grab;
+}
+
+.matchCardHeader .closeBtn {
+    display: block;
+    background-color: #f0f0f0;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    text-align: center;
+    outline: none;
+    margin: 0px;
 }
 
 .matchContainer:active {
@@ -38,16 +50,70 @@
     text-align: center;
 }
 
-.matchContainer .btnDiv {
-    width: 100%;
-    height: 15%;
+.matchCardHeader {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    width: 100%;
+}
+
+.matchCardHeader h2 {
+    width: 100%;;
+}
+
+.statsDiv {
+    display: flex;
+    margin-top: 25px;
+    width: 100%;
+    height: auto;
+    margin-bottom: 5px;
+}
+
+.homeTeamsStatsDiv {
+    width: 50%;
+    height: 100%;
+    text-align: left;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    margin-right: 5px;
+    margin-left: 2px;
+    padding-left: 10px;
+    padding-right: 10px;
+    background-color: #f0f0f0;
+}
+
+.homeTeamsStatsDiv p {
+    padding-left: 5px;
+}
+
+.awayTeamsStatsDiv {
+    width: 50%;
+    height: 100%;
+    text-align: right;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    margin-left: 5px;
+    margin-right: 2px;
+    padding-left: 10px;
+    padding-right: 10px;
+    background-color: #f0f0f0;
+}
+
+.awayTeamsStatsDiv p {
+    padding-right: 5px;
+}
+
+.homeTeamsStatsDiv div {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
 }
 
-.matchContainer .btnDiv button {
-    margin: 0px;
+.awayTeamsStatsDiv div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .footer {
@@ -97,7 +163,6 @@ h2 {
 
 body {
     background-size: cover;
-    height: 100vh;
     background-color: rgb(255, 255, 255);
 }
 
@@ -139,10 +204,9 @@ button:hover {
 
 iframe {
     width: 100%;
-    height: 73%;
+    height: 290px;
 }
 
-/*  create a good style that matches this page style for my 'ul' and 'li' elements */
 ul {
     list-style-type: none;
     margin-bottom: 10px;
