@@ -223,7 +223,7 @@ function createMatchCard(matchID) {
 
     const xpGoalsHome = document.createElement('div');
     const xpGoalsHomeP = document.createElement('p'); xpGoalsHomeP.innerText = "xP Goals"; xpGoalsHome.appendChild(xpGoalsHomeP);
-    const xpGoalsHomeSpan = document.createElement('span'); xpGoalsHomeSpan.setAttribute('id', 'xPGoals'); xpGoalsHome.appendChild(xpGoalsHomeSpan);
+    const xpGoalsHomeSpan = document.createElement('span'); xpGoalsHomeSpan.setAttribute('id', 'expectedGoals'); xpGoalsHome.appendChild(xpGoalsHomeSpan);
     xpGoalsHomeSpan.innerText = "-";
     divHomeTeamStats.appendChild(xpGoalsHome);
 
@@ -259,7 +259,7 @@ function createMatchCard(matchID) {
 
     const xpGoalsAway = document.createElement('div');
     const xpGoalsAwayP = document.createElement('p'); xpGoalsAwayP.innerText = "xP Goals"; 
-    const xpGoalsAwaySpan = document.createElement('span'); xpGoalsAwaySpan.setAttribute('id', 'xPGoals'); xpGoalsAway.appendChild(xpGoalsAwaySpan); xpGoalsAway.appendChild(xpGoalsAwayP);
+    const xpGoalsAwaySpan = document.createElement('span'); xpGoalsAwaySpan.setAttribute('id', 'expectedGoals'); xpGoalsAway.appendChild(xpGoalsAwaySpan); xpGoalsAway.appendChild(xpGoalsAwayP);
     xpGoalsAwaySpan.innerText = "-";
     awayHomeTeamStats.appendChild(xpGoalsAway);
 
