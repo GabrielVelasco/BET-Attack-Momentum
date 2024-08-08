@@ -3,12 +3,6 @@
     2. for each live match, create a div that contains the graph pressure and the live result of the match
     3. update the live result of the match every 10 seconds
     4. add a button to remove the div of the match
-
-    WORKING ON: 
-
-    TODO:
-    add League selector (show only La Liga/Premier League... matches)
-    improve and add page styles
 */
 
 const mainCont = document.querySelector(".mainContainer");
@@ -20,185 +14,120 @@ function _equal(a, b){
     return a === b;
 }
 
-function matchContainerClicked(target){
-    return target.classList.contains("matchContainer");
-}
-
-function btnDivClicked(target){
-    return target.classList.contains("btnDiv");
-}
-
-function closeBtnClicked(target){
-    return target.classList.contains("closeBtn");
-}
-
-function expandBtnClicked(target){
-    return target.classList.contains("dropdownBtn");
-}
-
 document.addEventListener("click", (evt) => {
     evt.preventDefault();
+    const clickedElement = evt.target;
 
-    let clikedElement = evt.target;
-    if(matchContainerClicked(clikedElement)){
-        clikedElement.classList.toggle("divSelected");
-
-    }else if(btnDivClicked(clikedElement)){
-        clikedElement.parentElement.classList.toggle("divSelected");
-
-    }else if(closeBtnClicked(clikedElement)){
-        clikedElement.parentElement.parentElement.remove(); // remove the specific matchContainer div
-    
-    }else if(expandBtnClicked(clikedElement)){
-        clikedElement.classList.toggle('active');
-        clikedElement.nextSibling.classList.toggle('show');
+    if (clickedElement.classList.contains("matchContainer")) {
+        clickedElement.classList.toggle("divSelected");
+    } else if (clickedElement.classList.contains("btnDiv")) {
+        clickedElement.parentElement.classList.toggle("divSelected");
+    } else if (clickedElement.classList.contains("closeBtn")) {
+        clickedElement.closest(".matchContainer").remove();
+    } else if (clickedElement.classList.contains("dropdownBtn")) {
+        clickedElement.classList.toggle("active");
+        clickedElement.nextElementSibling.classList.toggle("show");
     }
 });
 
-async function getLiveMatches(){
-    /*
-        At each call to this function it will do a get req and update liveMatches array.
-    */
+async function getLiveMatches() {
+    try {
+        const response = await axios.get("https://www.sofascore.com/api/v1/sport/football/events/live");
+        liveMatches = response.data.events;
 
-    const url = "https://www.sofascore.com/api/v1/sport/football/events/live";
-    
-    const dataFromSofaScore = await axios.get(url);
-    liveMatches = dataFromSofaScore.data.events;
-    
-    if(liveMatches.length === 0)
-        throw "No live matches at the momment!";
-    
-    return "array of matches created";
+        if (liveMatches.length === 0) {
+            throw new Error("No live matches at the moment!");
+        }
+
+        console.log("Live matches fetched successfully!");
+        
+        return liveMatches;
+
+    } catch (error) {
+        console.error("Error fetching live matches:", error.message);
+        alert(error.message);
+    }
 }
 
-async function getMatchStats(matchID){
-    // GET https://www.sofascore.com/api/v1/event/matchID/statistics
+async function getMatchStats(matchID) {
+    try {
+        const response = await axios.get(`https://www.sofascore.com/api/v1/event/${matchID}/statistics`);
 
-    const url = `https://www.sofascore.com/api/v1/event/${matchID}/statistics`;
-    
-    const dataFromSofaScore = await axios.get(url);
-    let matchSats = dataFromSofaScore.data.statistics[0].groups[0].statisticsItems;
+        return response.data.statistics[0].groups[0].statisticsItems || [];
 
-    if(matchSats.length === 0)
-        throw "No stats for this match!";
-
-    return matchSats;
+    } catch (error) {
+        console.error(`Error fetching stats for match ID ${matchID}:`, error.message);
+        
+        return [];
+    }
 }
 
-function createIframeElementFor(matchID){
-    /*
-        Creates the <iframe> for a 'matchID' and set it's attributes 
-    */
-
+function createIframeElementFor(matchID) {
     const iframeElement = document.createElement('iframe');
-    const srcAtt = `https://widgets.sofascore.com/embed/attackMomentum?id=${matchID}&widgetBackground=Gray&v=2`; // url that SofaScore provides...
-    iframeElement.setAttribute("src", srcAtt);
-    iframeElement.setAttribute("frameborder", "0");
-    iframeElement.setAttribute("scrolling", "no");
-
+    iframeElement.src = `https://widgets.sofascore.com/embed/attackMomentum?id=${matchID}&widgetBackground=Gray&v=2`;
+    iframeElement.scrolling = "no";
+    
     return iframeElement;
 }
 
-function getLiveScoreboard(matchIdTarget){
-    /*
-        Given an matchID, search for this match at 'liveMatches', get home/away scores
-        returns a string with the live score of the match.
-        If match not found at 'liveMatches', returns "ENDED".
+function getLiveScoreboard(matchIdTarget) {
+    const match = liveMatches.find(match => match.id === matchIdTarget);
 
-        args:
-            matchID = ID of a live match
-        returns:
-            a String containing the live result of the match. Ex: "Home 2 - 1 Away" or "ENDED" (match not in 'liveMatches')
-    */
-
-    let homeScore = 0, awayScore = 0, homeTeamName = "", awayTeamName = "";
-    for(let match of liveMatches){
-        if(match.id === matchIdTarget){
-            // match found, get home/away scores
-
-            homeTeamName = match.homeTeam.shortName;
-            awayTeamName = match.awayTeam.shortName;
-            homeScore = match.homeScore.current;
-            awayScore = match.awayScore.current;
-            const liveResult = `${homeTeamName}⠀[${homeScore}]⠀-⠀[${awayScore}]⠀${awayTeamName}`;
-
-            return liveResult;
-        }
+    if (match) {
+        const { homeTeam, awayTeam, homeScore, awayScore } = match; // extract keys from match object
+        
+        return `${homeTeam.shortName} [${homeScore.current}] - [${awayScore.current}] ${awayTeam.shortName}`;
     }
 
-    return 'ENDED';
+    return "ENDED"; // match not in liveMatches array, it ended...
 }
 
-async function updateScores(){
-    /*
-        Once called it will iterates over the list of 'h2', for each 'h2', get the id, call getLiveResultFor(id)
-        update 'h2' with new result if needed.
-    */
+async function updateScores() {
+    try {
+        await getLiveMatches();
 
-    try{
-        await getLiveMatches(); // update 'liveMatches'
+        document.querySelectorAll('h2').forEach(scoreH2 => {
+            if(scoreH2.innerText.includes('ENDED')) return;
 
-        let liveScoreBoards = document.querySelectorAll('h2');
-        for(let scoreH2 of liveScoreBoards){
-            let matchID = Number(scoreH2.getAttribute("id"));
-            let oldScore = scoreH2.innerText;
+            const matchID = Number(scoreH2.id);
+            const newScore = getLiveScoreboard(matchID);
 
-            let newScore = getLiveScoreboard(matchID);
-            if(newScore === 'ENDED'){
-                if(oldScore.search('ENDED') === -1)
-                    scoreH2.innerText = oldScore + ' ' + '[ENDED]';
+            if(newScore === "ENDED") {
+                scoreH2.innerText = `${scoreH2.innerText} [ENDED]`;
 
-            }else if(!_equal(oldScore, newScore)){
+            }else if(newScore !== scoreH2.innerText) {
                 scoreH2.innerText = newScore;
             }
-        }
-    
+        });
+
         console.log("Live results updated!");
 
-    }catch(e){
-        console.log(e);
-        alert('No live matches at the moment!');
+    } catch (error) {
+        console.error("Error updating scores:", error.message);
+
+    } finally {
+        setTimeout(updateScores, 10000); // call this function again after 10 seconds
     }
 }
 
-function updateStats() {
-    /*
-        For each stats card (in which it's div id is a match id), get stats (get request sofascore api) and update the respective 'span' elements.
-        Each 'span' element has an id that matches the key of the stats object. 
-        Example: there's a 'span' inside 'stats div > homeTeamsStats' with id 'ballPossession'. 
-        Do it seperately for home and away teams.
+async function updateStats() {
+    const statsDivs = document.querySelectorAll('.statsDiv');
 
-        Example:
-        stats[0].key -> ballPossession | stats[0].home -> home team ballposs | stats[0].away -> away team ballposs
-    */
-
-    let statsDivs = document.querySelectorAll('.statsDiv');
-    for (let statsDiv of statsDivs) {
+    statsDivs.forEach(async (statsDiv) => {
         const matchID = statsDiv.id;
+        const stats = await getMatchStats(matchID);
 
-        getMatchStats(matchID)
-        .then((stats) => {
-            const homeTeamStatsDiv = statsDiv.querySelector('.homeTeamsStatsDiv');
-            const awayTeamStatsDiv = statsDiv.querySelector('.awayTeamsStatsDiv');
-            
-            for(let s of stats){
-                const statName = s.key;
-                const homeStatSpan = homeTeamStatsDiv.querySelector('#' + statName);
-                const awayStatSpan = awayTeamStatsDiv.querySelector('#' + statName);
-
-                if(homeStatSpan && awayStatSpan){
-                    // if the stat exists, update the value
-                    homeStatSpan.innerText = `${s.home}`;
-                    awayStatSpan.innerText = `${s.away}`;
-                }
-            }
-        })
-        .catch((e) => {
-            console.log(e);
+        stats.forEach(({ key, home, away }) => {
+            const homeStatSpan = statsDiv.querySelector(`.homeTeamsStatsDiv #${key}`);
+            const awayStatSpan = statsDiv.querySelector(`.awayTeamsStatsDiv #${key}`);
+            if (homeStatSpan) homeStatSpan.innerText = home;
+            if (awayStatSpan) awayStatSpan.innerText = away;
         });
-    }
+    });
 
     console.log("Stats updated!");
+
+    setTimeout(updateStats, 30000); // call this function again after 10 seconds
 }
 
 // Drag and Drop functions
@@ -391,8 +320,6 @@ async function main(){
         await createGameCards();
         updateScores();
         updateStats();
-        setInterval(updateScores, 1000);
-        setInterval(updateStats, 30000);
         
     }catch (e){
         console.log(e);
