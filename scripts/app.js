@@ -8,7 +8,7 @@
 const mainCont = document.querySelector(".mainContainer");
 let draggedElement = null;
 
-let liveMatches = [];
+let liveMatchesList = [];
 
 function _equal(a, b){
     return a === b;
@@ -30,18 +30,20 @@ document.addEventListener("click", (evt) => {
     }
 });
 
-async function getLiveMatches() {
+async function updateLiveMatchesList() {
+    // Fetch live matches from sofascore, update the array 'liveMatches'
+
     try {
         const response = await axios.get("https://www.sofascore.com/api/v1/sport/football/events/live");
-        liveMatches = response.data.events;
+        liveMatchesList = response.data.events;
 
-        if (liveMatches.length === 0) {
+        if (liveMatchesList.length === 0) {
             throw new Error("No live matches at the moment!");
         }
 
-        console.log("Live matches fetched successfully!");
+        console.log("Live matches array updated successfully!");
         
-        return liveMatches;
+        return liveMatchesList;
 
     } catch (error) {
         console.error("Error fetching live matches:", error.message);
@@ -50,6 +52,14 @@ async function getLiveMatches() {
 }
 
 async function getMatchStats(matchID) {
+    // returned array contains objects (stats objects)
+    // each object contains: stat key (ballPossession, shots, corners, ...), home (home teams stat value), away (away teams stat value)
+    // 
+    // example of returned array structure: [ 
+    //                                        {key: "ballPossession", home: "60%", away: "40%"}, 
+    //                                        {key: "shots", home: "5", away: "3"}, ...
+    //                                      ]
+
     try {
         const response = await axios.get(`https://www.sofascore.com/api/v1/event/${matchID}/statistics`);
 
@@ -71,21 +81,24 @@ function createIframeElementFor(matchID) {
 }
 
 function getLiveScoreboard(matchIdTarget) {
-    const match = liveMatches.find(match => match.id === matchIdTarget);
+    const match = liveMatchesList.find(match => match.id === matchIdTarget);
 
     if (match) {
-        const { homeTeam, awayTeam, homeScore, awayScore } = match; // extract keys from match object
+        const { homeTeam, awayTeam, homeScore, awayScore } = match; // extract value of the respective keys from match object
         
         return `${homeTeam.shortName} [${homeScore.current}] - [${awayScore.current}] ${awayTeam.shortName}`;
     }
 
-    return "ENDED"; // match not in liveMatches array, it ended...
+    return "ENDED"; // if match not in liveMatchesList, then it ended...
 }
 
 async function updateScores() {
-    try {
-        await getLiveMatches();
+    // Each 'h2.id' is a match ID, use it to get the live score of a match
 
+    try {
+        await updateLiveMatchesList();
+
+        // iterates through all h2 elements, for each, get it's id, get the live score for that id and update the text of the h2 element
         document.querySelectorAll('h2').forEach(scoreH2 => {
             if(scoreH2.innerText.includes('ENDED')) return;
 
@@ -111,13 +124,16 @@ async function updateScores() {
 }
 
 async function updateStats() {
+    // Each 'statsDiv.id' is a match ID, use it to get the stats of a match (similar to 'updateScores' func)
+    // Though to get the stats of a match, we need to make a separate request to the API
+
     const statsDivs = document.querySelectorAll('.statsDiv');
 
     statsDivs.forEach(async (statsDiv) => {
         const matchID = statsDiv.id;
-        const stats = await getMatchStats(matchID);
+        const statsReturned = await getMatchStats(matchID);
 
-        stats.forEach(({ key, home, away }) => {
+        statsReturned.forEach(({ key, home, away }) => {
             const homeStatSpan = statsDiv.querySelector(`.homeTeamsStatsDiv #${key}`);
             const awayStatSpan = statsDiv.querySelector(`.awayTeamsStatsDiv #${key}`);
             if (homeStatSpan) homeStatSpan.innerText = home;
@@ -307,7 +323,7 @@ async function createGameCards(){
         Create divs for each live match, each div contains the graph pressure and the live result of the match
     */
 
-    for(let match of liveMatches){
+    for(let match of liveMatchesList){
         if(hasPressureGraph(match))
             createMatchCard(match.id);
     }
@@ -316,7 +332,7 @@ async function createGameCards(){
 async function main(){
     try{
         // do request, build array of matches, for each match extract match id and build iframe..
-        await getLiveMatches();
+        await updateLiveMatchesList();
         await createGameCards();
         updateScores();
         updateStats();
