@@ -257,6 +257,7 @@ function createMatchCard(matchID) {
     const cornersHome = document.createElement('div');
     const cornersHomeP = document.createElement('p'); cornersHomeP.innerText = "Corners"; cornersHome.appendChild(cornersHomeP);
     const cornersHomeSpan = document.createElement('span'); cornersHomeSpan.setAttribute('id', 'cornerKicks'); cornersHome.appendChild(cornersHomeSpan);
+    cornersHomeSpan.innerText = "-";
     divHomeTeamStats.appendChild(cornersHome);
 
     const passesHome = document.createElement('div');
@@ -293,6 +294,7 @@ function createMatchCard(matchID) {
     const cornersAway = document.createElement('div');
     const cornersAwayP = document.createElement('p'); cornersAwayP.innerText = "Corners"; 
     const cornersAwaySpan = document.createElement('span'); cornersAwaySpan.setAttribute('id', 'cornerKicks'); cornersAway.appendChild(cornersAwaySpan); cornersAway.appendChild(cornersAwayP);
+    cornersAwaySpan.innerText = "-";
     awayHomeTeamStats.appendChild(cornersAway);
 
     const passesAway = document.createElement('div');
