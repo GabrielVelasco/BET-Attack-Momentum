@@ -199,12 +199,7 @@ function addDragAndDropHandlers(element) {
     element.addEventListener('drop', handleDrop, false);
     element.addEventListener('dragend', handleDragEnd, false);
 }
-
-document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll('.matchContainer').forEach(addDragAndDropHandlers);
-});
-
-///////////////////////////
+// Drag and Drop functions added
 
 function createMatchCard(matchID) {
     const gameCard = document.createElement('div');
