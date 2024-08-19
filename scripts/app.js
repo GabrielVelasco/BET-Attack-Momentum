@@ -31,16 +31,15 @@ async function updateLiveMatchesList() {
         liveMatchesList = response.data.events;
 
         if (liveMatchesList.length === 0) {
-            throw new Error("No live matches at the moment!");
+            throw new Error("At updateLiveMatchesList(). No live matches at the moment.");
         }
 
-        console.log("Live matches array updated successfully!");
+        console.log("Live matches array updated.");
         
         return liveMatchesList;
 
     } catch (error) {
-        console.error("Error fetching live matches:", error.message);
-        alert(error.message);
+        throw error;
     }
 }
 
@@ -59,9 +58,7 @@ async function getMatchStats(matchID) {
         return response.data.statistics[0].groups[0].statisticsItems || [];
 
     } catch (error) {
-        console.error(`Error fetching stats for match ID ${matchID}:`, error.message);
-        
-        return [];
+        throw error;
     }
 }
 
@@ -106,10 +103,10 @@ async function updateScores() {
             }
         });
 
-        console.log("Live results updated!");
+        console.log("Scoreboards updated. Next update in 10 seconds.");
 
     } catch (error) {
-        console.error("Error updating scores:", error.message);
+        console.error("Error when running updateScores(): ", error.message);
 
     } finally {
         setTimeout(updateScores, 10000); // call this function again after 10 seconds
@@ -124,17 +121,24 @@ async function updateStats() {
 
     statsDivs.forEach(async (statsDiv) => {
         const matchID = statsDiv.id;
-        const statsReturned = await getMatchStats(matchID);
 
-        statsReturned.forEach(({ key, home, away }) => {
-            const homeStatSpan = statsDiv.querySelector(`.homeTeamsStatsDiv #${key}`);
-            const awayStatSpan = statsDiv.querySelector(`.awayTeamsStatsDiv #${key}`);
-            if (homeStatSpan) homeStatSpan.innerText = home;
-            if (awayStatSpan) awayStatSpan.innerText = away;
-        });
+        try{
+            const statsReturned = await getMatchStats(matchID);
+
+            statsReturned.forEach(({ key, home, away }) => {
+                const homeStatSpan = statsDiv.querySelector(`.homeTeamsStatsDiv #${key}`);
+                const awayStatSpan = statsDiv.querySelector(`.awayTeamsStatsDiv #${key}`);
+                if (homeStatSpan) homeStatSpan.innerText = home;
+                if (awayStatSpan) awayStatSpan.innerText = away;
+            });
+
+        } catch (error) {
+            console.error(`Error at updateStats(). When requesting ${matchID} stats. Error: ${error.message}`);
+        }
+
     });
 
-    console.log("Stats updated!");
+    console.log("Stats updated. Next update in 30 seconds.");
 
     setTimeout(updateStats, 30000); // call this function again after 10 seconds
 }
@@ -253,7 +257,7 @@ function hasPressureGraph(match){
     return match.hasEventPlayerHeatMap || match.hasEventPlayerStatistics;
 }
 
-async function createGameCards(){
+async function createMatchCards(){
     /*
         Create divs for each live match, each div contains the graph pressure and the live result of the match
     */
@@ -268,13 +272,13 @@ async function main(){
     try{
         // do request, build array of matches, for each match extract match id and build iframe..
         await updateLiveMatchesList();
-        await createGameCards();
+        createMatchCards();
         updateScores();
         updateStats();
         
     }catch (e){
-        console.log(e);
-        alert('No live matches at the moment!');
+        console.error(e.message);
+        alert(e.message);
     }
 }
 
