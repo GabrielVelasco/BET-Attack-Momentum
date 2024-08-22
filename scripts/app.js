@@ -8,7 +8,7 @@ function _equal(a, b){
 }
 
 document.addEventListener("click", (evt) => {
-    evt.preventDefault();
+    //evt.preventDefault();
     const clickedElement = evt.target;
 
     if (clickedElement.classList.contains("matchContainer")) {
