@@ -2,6 +2,15 @@
 <html lang="en">
 
 <head>
+    <!-- Google Tag Manager -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NBCMGEQML5"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-NBCMGEQML5');
+    </script>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Live football match scoreboards and stats.">
@@ -15,17 +24,51 @@
     <!-- Axios script -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 
-    <!-- Google Tag Manager -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-NBCMGEQML5"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
-        gtag('config', 'G-NBCMGEQML5');
-    </script>
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            text-align: center;
+        }
+        .close-modal {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close-modal:hover,
+        .close-modal:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
 </head>
 
 <body>
+    <div id="newVersionModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <p>Try the new version made with React (and it has more stats...)</p>
+            <a href="https://gabrielvelasco.github.io/Attack-Momentum-React/" target="_blank">Visit New Version</a>
+        </div>
+    </div>
+
     <header class="obs">
         <ul>
             <li>SofaScore doesn't provide graphs for all matches.</li>

@@ -268,8 +268,27 @@ async function createMatchCards(){
     }
 }
 
+function showNewVersionModal() {
+    const modal = document.getElementById('newVersionModal');
+    const closeBtn = modal.querySelector('.close-modal');
+
+    modal.style.display = 'block';
+
+    closeBtn.onclick = function() {
+        modal.style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = 'none';
+        }
+    }
+}
+
 async function main(){
     try{
+        showNewVersionModal();
+
         // do request, build array of matches, for each match extract match id and build iframe..
         await updateLiveMatchesList();
         createMatchCards();
