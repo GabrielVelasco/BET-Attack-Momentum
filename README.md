@@ -6,7 +6,7 @@ Feel free to contribute to this project (fork/copy...). Any sugestion you can em
 A Web Site that gather all football live matches pressure graphs, live scoreboard and stats from SofaScore.
 
 ## preview
-![Image Preview](https://raw.githubusercontent.com/GabrielVelasco/BET-Attack-Momentum/main/imgs/preview.png)
+![Image Preview](https://raw.githubusercontent.com/GabrielVelasco/BET-Attack-Momentum/main/imgs/prev.png)
 
 ## "Architecture"
 ![Image Preview](https://raw.githubusercontent.com/GabrielVelasco/BET-Attack-Momentum/main/imgs/archi.png)
