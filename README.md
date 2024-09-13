@@ -8,6 +8,9 @@ A Web Site that gather all football live matches pressure graphs, live scoreboar
 ## preview
 ![Image Preview](https://raw.githubusercontent.com/GabrielVelasco/BET-Attack-Momentum/main/imgs/preview.png)
 
+## "Architecture"
+![Image Preview](https://raw.githubusercontent.com/GabrielVelasco/BET-Attack-Momentum/main/imgs/attack-momentum-architecture.mermaid)
+
 ## Purpose
 Help users to decide which match to watch / bet.
 Help bettors to find a good match for goal/corners based on the pressure graphs and stats (SofaScore attack momentum graph).
