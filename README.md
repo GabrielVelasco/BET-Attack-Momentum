@@ -9,7 +9,7 @@ A Web Site that gather all football live matches pressure graphs, live scoreboar
 ![Image Preview](https://raw.githubusercontent.com/GabrielVelasco/BET-Attack-Momentum/main/imgs/preview.png)
 
 ## "Architecture"
-![Image Preview](https://raw.githubusercontent.com/GabrielVelasco/BET-Attack-Momentum/main/imgs/attack-momentum-architecture.mermaid)
+![Image Preview](https://raw.githubusercontent.com/GabrielVelasco/BET-Attack-Momentum/main/imgs/attack-momentum-architecture.png)
 
 ## Purpose
 Help users to decide which match to watch / bet.
