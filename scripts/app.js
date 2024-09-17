@@ -287,8 +287,6 @@ function showNewVersionModal() {
 
 async function main(){
     try{
-        showNewVersionModal();
-
         // do request, build array of matches, for each match extract match id and build iframe..
         await updateLiveMatchesList();
         createMatchCards();
