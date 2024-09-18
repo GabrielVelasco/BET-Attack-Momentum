@@ -29,9 +29,20 @@ function handleDragLeave(event) {
 function handleDrop(event) {
     event.preventDefault();
     event.stopPropagation();
+
     if (draggedElement !== event.target && event.target.classList.contains('matchContainer')) {
+        // Swap innerHTML and div attributes
+
+        const draggedLeagueAtt = draggedElement.getAttribute('league');
+        const targetLeagueAtt = event.target.getAttribute('league');
+
+        const tmp = draggedElement.innerHTML;
         draggedElement.innerHTML = event.target.innerHTML;
-        event.target.innerHTML = event.dataTransfer.getData('text/html');
+        draggedElement.setAttribute('league', targetLeagueAtt);
+
+        event.target.innerHTML = tmp;
+        event.target.setAttribute('league', draggedLeagueAtt);
+
         addDragAndDropHandlers(draggedElement); // Re-apply handlers to new elements
         addDragAndDropHandlers(event.target);
     }
@@ -40,6 +51,7 @@ function handleDrop(event) {
 
 function handleDragEnd(event) {
     event.target.style.opacity = "1.0";
+
     document.querySelectorAll('.matchContainer').forEach(item => {
         item.classList.remove('over');
     });

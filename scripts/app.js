@@ -1,11 +1,28 @@
 import { addDragAndDropHandlers } from './dragAndDrop.js';
 
 const mainCont = document.querySelector(".mainContainer");
+const leagueSelector = document.querySelector("#leagueSelector");
+
 let liveMatchesList = [];
 
 function _equal(a, b){
     return a === b;
 }
+
+leagueSelector.addEventListener("change", (evt) => {
+    const selectedLeague = evt.target.value;
+    const matchContainers = document.querySelectorAll('.matchContainer');
+
+    matchContainers.forEach((matchContainer) => {
+        const league = matchContainer.getAttribute('league');
+
+        if (_equal(selectedLeague, "All") || _equal(selectedLeague, league)) {
+            matchContainer.style.display = "block";
+        } else {
+            matchContainer.style.display = "none";
+        }
+    });
+});
 
 document.addEventListener("click", (evt) => {
     //evt.preventDefault();
@@ -143,26 +160,28 @@ async function updateStats() {
     setTimeout(updateStats, 30000); // call this function again after 10 seconds
 }
 
-function createMatchCard(matchID) {
+function createMatchCard(match) {
     const gameCard = document.createElement('div');
+
     gameCard.classList.add("matchContainer");
     gameCard.setAttribute('draggable', 'true');
+    gameCard.setAttribute('league', match.tournament.name);
 
-    const iframeElement = createIframeElementFor(matchID);
+    const iframeElement = createIframeElementFor(match.id);
 
-    const divForBtnAndScoreboard = document.createElement('div');
-    divForBtnAndScoreboard.classList.add('matchCardHeader');
+    const matchCardHeader = document.createElement('div');
+    matchCardHeader.classList.add('matchCardHeader');
 
     const btnRemoveCard = document.createElement('button');
     btnRemoveCard.classList.add('closeBtn');
     btnRemoveCard.innerText = "X";
-    divForBtnAndScoreboard.appendChild(btnRemoveCard);
+    matchCardHeader.appendChild(btnRemoveCard);
 
     const matchLiveResultH2 = document.createElement('h2');
-    matchLiveResultH2.setAttribute("id", matchID);
-    divForBtnAndScoreboard.appendChild(matchLiveResultH2);
+    matchLiveResultH2.setAttribute("id", match.id);
+    matchCardHeader.appendChild(matchLiveResultH2);
 
-    gameCard.appendChild(divForBtnAndScoreboard);
+    gameCard.appendChild(matchCardHeader);
     gameCard.appendChild(iframeElement);
 
     // add stats for text for home team\
@@ -241,7 +260,7 @@ function createMatchCard(matchID) {
 
     const statsDiv = document.createElement('div');
     statsDiv.classList.add('statsDiv');
-    statsDiv.setAttribute('id', matchID);
+    statsDiv.setAttribute('id', match.id);
 
     statsDiv.appendChild(divHomeTeamStats);
     statsDiv.appendChild(awayHomeTeamStats);
@@ -257,14 +276,21 @@ function hasPressureGraph(match){
     return match.hasEventPlayerHeatMap || match.hasEventPlayerStatistics;
 }
 
-async function createMatchCards(){
+async function checkLiveMatches(){
     /*
         Create divs for each live match, each div contains the graph pressure and the live result of the match
     */
 
     for(let match of liveMatchesList){
-        if(hasPressureGraph(match))
-            createMatchCard(match.id);
+        if(hasPressureGraph(match)){
+
+            // Populate the league selector
+            if(!leagueSelector.innerHTML.includes(match.tournament.name)){
+                leagueSelector.innerHTML += `<option value="${match.tournament.name}">${match.tournament.name}</option>`;
+            }
+
+            createMatchCard(match);
+        }
     }
 }
 
@@ -289,7 +315,7 @@ async function main(){
     try{
         // do request, build array of matches, for each match extract match id and build iframe..
         await updateLiveMatchesList();
-        createMatchCards();
+        checkLiveMatches();
         updateScores();
         updateStats();
         

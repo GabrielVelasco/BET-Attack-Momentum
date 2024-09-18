@@ -150,7 +150,7 @@ body {
     margin-left: 10px;
 }
 
-button {
+button, select {
     padding: 10px 20px;
     background-color: #3498db;
     color: #fff;
