@@ -18,6 +18,8 @@ leagueSelector.addEventListener("change", (evt) => {
 
         if (_equal(selectedLeague, "All") || _equal(selectedLeague, league)) {
             matchContainer.style.display = "block";
+            matchContainer.querySelector('iframe').src = matchContainer.querySelector('iframe').src; // refresh iframe
+
         } else {
             matchContainer.style.display = "none";
         }
@@ -33,7 +35,7 @@ document.addEventListener("click", (evt) => {
     } else if (clickedElement.classList.contains("btnDiv")) {
         clickedElement.parentElement.classList.toggle("divSelected");
     } else if (clickedElement.classList.contains("closeBtn")) {
-        clickedElement.closest(".matchContainer").remove();
+        clickedElement.closest(".matchContainer").style.display = "none";
     } else if (clickedElement.classList.contains("dropdownBtn")) {
         clickedElement.classList.toggle("active");
         clickedElement.nextElementSibling.classList.toggle("show");
@@ -281,7 +283,7 @@ async function checkLiveMatches(){
         Create divs for each live match, each div contains the graph pressure and the live result of the match
     */
 
-    for(let match of liveMatchesList){
+    liveMatchesList.forEach(match => {
         if(hasPressureGraph(match)){
 
             // Populate the league selector
@@ -291,7 +293,7 @@ async function checkLiveMatches(){
 
             createMatchCard(match);
         }
-    }
+    });
 }
 
 function showNewVersionModal() {
