@@ -152,6 +152,20 @@ header ul {
     width: 100%;
 }
 
+.statsDiv div {
+    padding: 5px;
+}
+
+.statsDiv span {
+    font-size: 1.2em;
+    margin: 0 5px;
+}
+
+.statsDiv p {
+    margin: 0;
+    flex-grow: 1;
+}
+
 .homeTeamsStatsDiv,
 .awayTeamsStatsDiv {
     width: 50%;
@@ -164,6 +178,14 @@ header ul {
 .homeTeamsStatsDiv p,
 .awayTeamsStatsDiv p {
     margin: 0;
+}
+
+.homeTeamsStatsDiv p {
+    text-align: left;
+}
+
+.awayTeamsStatsDiv p {
+    text-align: right;
 }
 
 .homeTeamsStatsDiv div,

@@ -164,7 +164,6 @@ async function updateStats() {
 
 function createMatchCard(match) {
     const gameCard = document.createElement('div');
-
     gameCard.classList.add("matchContainer");
     gameCard.setAttribute('draggable', 'true');
     gameCard.setAttribute('league', match.tournament.name);
@@ -186,89 +185,54 @@ function createMatchCard(match) {
     gameCard.appendChild(matchCardHeader);
     gameCard.appendChild(iframeElement);
 
-    // add stats for text for home team\
-    const divHomeTeamStats = document.createElement('div');
-    divHomeTeamStats.classList.add('homeTeamsStatsDiv');
-
-    const ballPossHome = document.createElement('div');
-    const ballPossHomeP = document.createElement('p'); ballPossHomeP.innerText = "Ball Possession"; ballPossHome.appendChild(ballPossHomeP);
-    const ballPossHomeSpan = document.createElement('span'); ballPossHomeSpan.setAttribute('id', 'ballPossession'); ballPossHome.appendChild(ballPossHomeSpan);
-    divHomeTeamStats.appendChild(ballPossHome);
-
-    const xpGoalsHome = document.createElement('div');
-    const xpGoalsHomeP = document.createElement('p'); xpGoalsHomeP.innerText = "xP Goals"; xpGoalsHome.appendChild(xpGoalsHomeP);
-    const xpGoalsHomeSpan = document.createElement('span'); xpGoalsHomeSpan.setAttribute('id', 'expectedGoals'); xpGoalsHome.appendChild(xpGoalsHomeSpan);
-    xpGoalsHomeSpan.innerText = "-";
-    divHomeTeamStats.appendChild(xpGoalsHome);
-
-    const bigChancesHome = document.createElement('div');
-    const bigChancesHomeP = document.createElement('p'); bigChancesHomeP.innerText = "Big Chances"; bigChancesHome.appendChild(bigChancesHomeP);
-    const bigChancesHomeSpan = document.createElement('span'); bigChancesHomeSpan.setAttribute('id', 'bigChanceCreated'); bigChancesHome.appendChild(bigChancesHomeSpan);
-    bigChancesHomeSpan.innerText = "-";
-    divHomeTeamStats.appendChild(bigChancesHome);
-
-    const totalShotsHome = document.createElement('div');
-    const totalShotsHomeP = document.createElement('p'); totalShotsHomeP.innerText = "Total Shots"; totalShotsHome.appendChild(totalShotsHomeP);
-    const totalShotsHomeSpan = document.createElement('span'); totalShotsHomeSpan.setAttribute('id', 'totalShotsOnGoal'); totalShotsHome.appendChild(totalShotsHomeSpan);
-    divHomeTeamStats.appendChild(totalShotsHome);
-
-    const cornersHome = document.createElement('div');
-    const cornersHomeP = document.createElement('p'); cornersHomeP.innerText = "Corners"; cornersHome.appendChild(cornersHomeP);
-    const cornersHomeSpan = document.createElement('span'); cornersHomeSpan.setAttribute('id', 'cornerKicks'); cornersHome.appendChild(cornersHomeSpan);
-    cornersHomeSpan.innerText = "-";
-    divHomeTeamStats.appendChild(cornersHome);
-
-    const passesHome = document.createElement('div');
-    const passesHomeP = document.createElement('p'); passesHomeP.innerText = "Passes"; passesHome.appendChild(passesHomeP);
-    const passesHomeSpan = document.createElement('span'); passesHomeSpan.setAttribute('id', 'passes'); passesHome.appendChild(passesHomeSpan);
-    divHomeTeamStats.appendChild(passesHome);
-
-    // add stats for text for away team
-    const awayHomeTeamStats = document.createElement('div');
-    awayHomeTeamStats.classList.add('awayTeamsStatsDiv');
-
-    const ballPossAway = document.createElement('div');
-    const ballPossAwayP = document.createElement('p'); ballPossAwayP.innerText = "Ball Possession"; 
-    const ballPossAwaySpan = document.createElement('span'); ballPossAwaySpan.setAttribute('id', 'ballPossession'); ballPossAway.appendChild(ballPossAwaySpan); ballPossAway.appendChild(ballPossAwayP);
-    awayHomeTeamStats.appendChild(ballPossAway);
-
-    const xpGoalsAway = document.createElement('div');
-    const xpGoalsAwayP = document.createElement('p'); xpGoalsAwayP.innerText = "xP Goals"; 
-    const xpGoalsAwaySpan = document.createElement('span'); xpGoalsAwaySpan.setAttribute('id', 'expectedGoals'); xpGoalsAway.appendChild(xpGoalsAwaySpan); xpGoalsAway.appendChild(xpGoalsAwayP);
-    xpGoalsAwaySpan.innerText = "-";
-    awayHomeTeamStats.appendChild(xpGoalsAway);
-
-    const bigChancesAway = document.createElement('div');
-    const bigChancesAwayP = document.createElement('p'); bigChancesAwayP.innerText = "Big Chances"; 
-    const bigChancesAwaySpan = document.createElement('span'); bigChancesAwaySpan.setAttribute('id', 'bigChanceCreated'); bigChancesAway.appendChild(bigChancesAwaySpan); bigChancesAway.appendChild(bigChancesAwayP);
-    bigChancesAwaySpan.innerText = "-";
-    awayHomeTeamStats.appendChild(bigChancesAway);
-
-    const totalShotsAway = document.createElement('div');
-    const totalShotsAwayP = document.createElement('p'); totalShotsAwayP.innerText = "Total Shots"; 
-    const totalShotsAwaySpan = document.createElement('span'); totalShotsAwaySpan.setAttribute('id', 'totalShotsOnGoal'); totalShotsAway.appendChild(totalShotsAwaySpan); totalShotsAway.appendChild(totalShotsAwayP);
-    awayHomeTeamStats.appendChild(totalShotsAway);
-
-    const cornersAway = document.createElement('div');
-    const cornersAwayP = document.createElement('p'); cornersAwayP.innerText = "Corners"; 
-    const cornersAwaySpan = document.createElement('span'); cornersAwaySpan.setAttribute('id', 'cornerKicks'); cornersAway.appendChild(cornersAwaySpan); cornersAway.appendChild(cornersAwayP);
-    cornersAwaySpan.innerText = "-";
-    awayHomeTeamStats.appendChild(cornersAway);
-
-    const passesAway = document.createElement('div');
-    const passesAwayP = document.createElement('p'); passesAwayP.innerText = "Passes"; 
-    const passesAwaySpan = document.createElement('span'); passesAwaySpan.setAttribute('id', 'passes'); passesAway.appendChild(passesAwaySpan); passesAway.appendChild(passesAwayP);
-    awayHomeTeamStats.appendChild(passesAway);
-
     const statsDiv = document.createElement('div');
     statsDiv.classList.add('statsDiv');
     statsDiv.setAttribute('id', match.id);
 
+    const statConfigs = [
+        { key: 'ballPossession', name: 'Ball Possession', icon: '⚽' },
+        { key: 'expectedGoals', name: 'xP Goals', icon: '🥅' },
+        { key: 'bigChanceCreated', name: 'Big Chances', icon: '🎯' },
+        { key: 'totalShotsOnGoal', name: 'Total Shots', icon: '👟' },
+        { key: 'cornerKicks', name: 'Corners', icon: '🚩' },
+        { key: 'passes', name: 'Passes', icon: '🔄' }
+    ];
+
+    const divHomeTeamStats = document.createElement('div');
+    divHomeTeamStats.classList.add('homeTeamsStatsDiv');
+
+    const divAwayTeamStats = document.createElement('div');
+    divAwayTeamStats.classList.add('awayTeamsStatsDiv');
+
+    statConfigs.forEach(stat => {
+        const homeStatDiv = document.createElement('div');
+        const homeStatIcon = document.createElement('span');
+        homeStatIcon.textContent = stat.icon;
+        const homeStatName = document.createElement('p');
+        homeStatName.textContent = stat.name;
+        const homeStatValue = document.createElement('span');
+        homeStatValue.id = stat.key;
+        homeStatValue.textContent = '-';
+        homeStatDiv.append(homeStatIcon, homeStatName, homeStatValue);
+        divHomeTeamStats.appendChild(homeStatDiv);
+
+        const awayStatDiv = document.createElement('div');
+        const awayStatIcon = document.createElement('span');
+        awayStatIcon.textContent = stat.icon;
+        const awayStatName = document.createElement('p');
+        awayStatName.textContent = stat.name;
+        const awayStatValue = document.createElement('span');
+        awayStatValue.id = stat.key;
+        awayStatValue.textContent = '-';
+        awayStatDiv.append(awayStatValue, awayStatName, awayStatIcon);
+        divAwayTeamStats.appendChild(awayStatDiv);
+    });
+
     statsDiv.appendChild(divHomeTeamStats);
-    statsDiv.appendChild(awayHomeTeamStats);
+    statsDiv.appendChild(divAwayTeamStats);
 
     gameCard.appendChild(statsDiv);
-
+    
     mainCont.appendChild(gameCard);
     
     addDragAndDropHandlers(gameCard);
