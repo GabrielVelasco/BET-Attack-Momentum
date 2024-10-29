@@ -18,8 +18,7 @@ leagueSelector.addEventListener("change", (evt) => {
 
         if (_equal(selectedLeague, "All") || _equal(selectedLeague, league)) {
             matchContainer.style.display = "block";
-            matchContainer.querySelector('iframe').src = matchContainer.querySelector('iframe').src; // refresh iframe
-
+            matchContainer.querySelector('iframe').src = matchContainer.querySelector('iframe').src;
         } else {
             matchContainer.style.display = "none";
         }
@@ -27,7 +26,6 @@ leagueSelector.addEventListener("change", (evt) => {
 });
 
 document.addEventListener("click", (evt) => {
-    //evt.preventDefault();
     const clickedElement = evt.target;
 
     if (clickedElement.classList.contains("matchContainer")) {
@@ -43,8 +41,6 @@ document.addEventListener("click", (evt) => {
 });
 
 async function updateLiveMatchesList() {
-    // Fetch live matches from sofascore, update the array 'liveMatches'
-
     try {
         const response = await axios.get("https://www.sofascore.com/api/v1/sport/football/events/live");
         liveMatchesList = response.data.events;
@@ -63,18 +59,103 @@ async function updateLiveMatchesList() {
 }
 
 async function getMatchStats(matchID) {
-    // returned array contains objects (stats objects)
-    // each object contains: stat key (ballPossession, shots, corners, ...), home (home teams stat value), away (away teams stat value)
-    // 
-    // example of returned array structure: [ 
-    //                                        {key: "ballPossession", home: "60%", away: "40%"}, 
-    //                                        {key: "shots", home: "5", away: "3"}, ...
-    //                                      ]
+    // get all stats from all groups
 
     try {
         const response = await axios.get(`https://www.sofascore.com/api/v1/event/${matchID}/statistics`);
+        
+        // exemple of JSON response:
+        
+        // {
+        //     "statistics": [
+        //         {
+        //             "period": "ALL",
+        //             "groups": [
+        //                 {
+        //                     "groupName": "Match overview",
+        //                     "statisticsItems": [
+        //                         { "name": "Ball possession", "home": "39%", "away": "61%" },
+        //                         { "name": "Expected goals", "home": "2.00", "away": "0.59" },
+        //                         { "name": "Big chances", "home": "4", "away": "0" },
+        //                         { "name": "Total shots", "home": "20", "away": "8" },
+        //                         { "name": "Goalkeeper saves", "home": "1", "away": "4" }
+        //                         ...
+        //                     ]
+        //                 },
+        //                 {
+        //                     "groupName": "Shots",
+        //                     "statisticsItems": [
+        //                         { "name": "Total shots", "home": "20", "away": "8" },
+        //                         { "name": "Shots on target", "home": "6", "away": "2" },
+        //                         { "name": "Shots off target", "home": "9", "away": "5" }
+        //                         ...
+        //                     ]
+        //                 },
+        //                 {
+        //                     "groupName": "Attack",
+        //                     "statisticsItems": [
+        //                         { "name": "Big chances scored", "home": "1", "away": "0" },
+        //                         { "name": "Touches in penalty area", "home": "27", "away": "15" }
+        //                         ...
+        //                     ]
+        //                 }
+        //             ]
+        //         },
+        //         {
+        //             "period": "1ST",
+        //             "groups": [
+        //                 {
+        //                     "groupName": "Match overview",
+        //                     "statisticsItems": [
+        //                         { "name": "Ball possession", "home": "42%", "away": "58%" },
+        //                         { "name": "Expected goals", "home": "0.76", "away": "0.15" }
+        //                         ...
+        //                     ]
+        //                 },
+        //                 {
+        //                     "groupName": "Shots",
+        //                     "statisticsItems": [
+        //                         { "name": "Total shots", "home": "12", "away": "2" },
+        //                         { "name": "Shots on target", "home": "4", "away": "1" }
+        //                         ...
+        //                     ]
+        //                 }
+        //             ]
+        //         },
+        //         {
+        //             "period": "2ND",
+        //             "groups": [
+        //                 {
+        //                     "groupName": "Match overview",
+        //                     "statisticsItems": [
+        //                         { "name": "Ball possession", "home": "37%", "away": "63%" },
+        //                         { "name": "Expected goals", "home": "1.24", "away": "0.44" }
+        //                         ...
+        //                     ]
+        //                 },
+        //                 {
+        //                     "groupName": "Shots",
+        //                     "statisticsItems": [
+        //                         { "name": "Total shots", "home": "8", "away": "6" },
+        //                         { "name": "Shots on target", "home": "2", "away": "1" }
+        //                         ...
+        //                     ]
+        //                 }
+        //             ]
+        //         }
+        //     ]
+        // }        
 
-        return response.data.statistics[0].groups[0].statisticsItems || [];
+        const allStats = [];
+
+        // statistics[0] ==> for ALL periods. statistics[1] ==> for 1ST period. statistics[2] ==> for 2ND period.
+        response.data.statistics[0].groups.forEach(group => {
+            const groupStats = group.statisticsItems;
+
+            allStats.push(...groupStats);
+        });
+
+        return allStats;
 
     } catch (error) {
         throw error;
@@ -93,21 +174,17 @@ function getLiveScoreboard(matchIdTarget) {
     const match = liveMatchesList.find(match => match.id === matchIdTarget);
 
     if (match) {
-        const { homeTeam, awayTeam, homeScore, awayScore } = match; // extract value of the respective keys from match object
-        
+        const { homeTeam, awayTeam, homeScore, awayScore } = match;
         return `${homeTeam.shortName} [${homeScore.current}] - [${awayScore.current}] ${awayTeam.shortName}`;
     }
 
-    return "ENDED"; // if match not in liveMatchesList, then it ended...
+    return "ENDED";
 }
 
 async function updateScores() {
-    // Each 'h2.id' is a match ID, use it to get the live score of a match
-
     try {
         await updateLiveMatchesList();
 
-        // iterates through all h2 elements, for each, get it's id, get the live score for that id and update the text of the h2 element
         document.querySelectorAll('h2').forEach(scoreH2 => {
             if(scoreH2.innerText.includes('ENDED')) return;
 
@@ -116,7 +193,6 @@ async function updateScores() {
 
             if(newScore === "ENDED") {
                 scoreH2.innerText = `${scoreH2.innerText} [ENDED]`;
-
             }else if(newScore !== scoreH2.innerText) {
                 scoreH2.innerText = newScore;
             }
@@ -128,14 +204,11 @@ async function updateScores() {
         console.error("Error when running updateScores(): ", error.message);
 
     } finally {
-        setTimeout(updateScores, 10000); // call this function again after 10 seconds
+        setTimeout(updateScores, 10000);
     }
 }
 
 async function updateStats() {
-    // Each 'statsDiv.id' is a match ID, use it to get the stats of a match (similar to 'updateScores' func)
-    // Though to get the stats of a match, we need to make a separate request to the API
-
     const statsDivs = document.querySelectorAll('.statsDiv');
 
     statsDivs.forEach(async (statsDiv) => {
@@ -154,12 +227,10 @@ async function updateStats() {
         } catch (error) {
             console.error(`Error at updateStats(). When requesting ${matchID} stats. Error: ${error.message}`);
         }
-
     });
 
     console.log("Stats updated. Next update in 30 seconds.");
-
-    setTimeout(updateStats, 30000); // call this function again after 10 seconds
+    setTimeout(updateStats, 30000);
 }
 
 function createMatchCard(match) {
@@ -194,8 +265,11 @@ function createMatchCard(match) {
         { key: 'expectedGoals', name: 'xP Goals', icon: '🥅' },
         { key: 'bigChanceCreated', name: 'Big Chances', icon: '🎯' },
         { key: 'totalShotsOnGoal', name: 'Total Shots', icon: '👟' },
+        { key: 'totalShotsInsideBox', name: 'Shots Inside Box', icon: '📍' },
+        { key: 'totalShotsOutsideBox', name: 'Shots Outside Box', icon: '🎯' },
         { key: 'cornerKicks', name: 'Corners', icon: '🚩' },
-        { key: 'passes', name: 'Passes', icon: '🔄' }
+        { key: 'passes', name: 'Passes', icon: '🔄' },
+        { key: 'totalClearance', name: 'Clearances', icon: '🛡️' }
     ];
 
     const divHomeTeamStats = document.createElement('div');
@@ -243,14 +317,8 @@ function hasPressureGraph(match){
 }
 
 async function checkLiveMatches(){
-    /*
-        Create divs for each live match, each div contains the graph pressure and the live result of the match
-    */
-
     liveMatchesList.forEach(match => {
         if(hasPressureGraph(match)){
-
-            // Populate the league selector
             if(!leagueSelector.innerHTML.includes(match.tournament.name)){
                 leagueSelector.innerHTML += `<option value="${match.tournament.name}">${match.tournament.name}</option>`;
             }
@@ -279,7 +347,6 @@ function showNewVersionModal() {
 
 async function main(){
     try{
-        // do request, build array of matches, for each match extract match id and build iframe..
         await updateLiveMatchesList();
         checkLiveMatches();
         updateScores();
