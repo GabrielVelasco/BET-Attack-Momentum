@@ -156,7 +156,10 @@ iframe {
     display: flex;
     justify-content: center;
     gap: 10px;
-    margin-bottom: 15px;
+    align-items: center;
+    margin: 0px auto 10px auto;
+    /* margin-bottom: 15px; */
+    /* width: 40%; */
 }
 
 .periodBtn {
