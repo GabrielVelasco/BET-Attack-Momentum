@@ -95,15 +95,15 @@ body {
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
+    gap: 30px;
 }
 
 .matchContainer {
     display: flex;
     flex-direction: column;
-    margin: 10px;
     padding: 10px;
     border-radius: 10px;
-    box-shadow: 2px 2px 15px rgba(72, 71, 71, 0.24);
+    box-shadow: 2px 2px 15px rgba(72, 71, 71, 0.815);
     width: 540px;
     cursor: grab;
     transition: background-color 0.3s ease;
@@ -180,13 +180,6 @@ iframe {
     background-color: #3498db;
     color: white;
     border-color: #2980b9;
-}
-
-@media (max-width: 500px) {
-    .periodBtn {
-        padding: 6px 12px;
-        font-size: 12px;
-    }
 }
 
 .statsDiv {
@@ -285,5 +278,20 @@ footer a {
 
     .statsDiv div {
         padding: 2px;
+    }
+
+    .matchContainer {
+        width: 90%;
+    }
+
+    .closeBtn {
+        width: 47px;
+        height: 28px;
+        padding: 0;
+    }
+
+    .periodBtn {
+        padding: 6px 12px;
+        font-size: 12px;
     }
 }
