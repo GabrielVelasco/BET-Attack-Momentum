@@ -131,7 +131,6 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 20px;
     border: 1px solid #ccc;
     background-color: #f0f0f0;
     border-radius: 5px;
@@ -149,7 +148,6 @@ iframe {
     width: 100%;
     height: 290px;
     border: none;
-    margin-bottom: 15px;
 }
 
 .periodSelector {
@@ -157,7 +155,7 @@ iframe {
     justify-content: center;
     gap: 10px;
     align-items: center;
-    margin: 0px auto 10px auto;
+    margin: 10px auto 10px auto;
     /* margin-bottom: 15px; */
     /* width: 40%; */
 }
@@ -184,9 +182,10 @@ iframe {
 
 .statsDiv {
     display: flex;
-    margin-bottom: 20px;
+    /* margin-bottom: 10px; */
     font-size: medium;
     width: 100%;
+    gap: 10px;
 }
 
 .statsDiv div {
@@ -231,14 +230,6 @@ iframe {
     justify-content: space-between;
     align-items: center;
     padding: 5px;
-}
-
-.homeTeamsStatsDiv {
-    margin-right: 10px;
-}
-
-.awayTeamsStatsDiv {
-    margin-left: 10px;
 }
 
 button {

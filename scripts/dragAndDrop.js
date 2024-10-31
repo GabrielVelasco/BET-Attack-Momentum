@@ -34,14 +34,18 @@ function handleDrop(event) {
         // Swap innerHTML and div attributes
 
         const draggedLeagueAtt = draggedElement.getAttribute('league');
+        const draggedMatchId = draggedElement.getAttribute('id');
         const targetLeagueAtt = event.target.getAttribute('league');
+        const targetMatchId = event.target.getAttribute('id');
 
         const tmp = draggedElement.innerHTML;
         draggedElement.innerHTML = event.target.innerHTML;
         draggedElement.setAttribute('league', targetLeagueAtt);
+        draggedElement.setAttribute('id', targetMatchId);
 
         event.target.innerHTML = tmp;
         event.target.setAttribute('league', draggedLeagueAtt);
+        event.target.setAttribute('id', draggedMatchId);
 
         addDragAndDropHandlers(draggedElement); // Re-apply handlers to new elements
         addDragAndDropHandlers(event.target);
