@@ -354,7 +354,10 @@ function createMatchCard(match) {
         { key: 'totalShotsOutsideBox', name: 'Shots Outside Box', icon: '🎯' },
         { key: 'cornerKicks', name: 'Corners', icon: '🚩' },
         { key: 'passes', name: 'Passes', icon: '🔄' },
-        { key: 'totalClearance', name: 'Clearances', icon: '🛡️' }
+        { key: 'totalClearance', name: 'Clearances', icon: '🛡️' },
+        { key: 'yellowCards', name: 'Yellow Cards', icon: '🟨' },
+        { key: 'redCards', name: 'Red Cards', icon: '🟥' }
+        // quiser adc mais stats, so adicionar mais objetos aqui...
     ];
 
     const divHomeTeamStats = document.createElement('div');
