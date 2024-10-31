@@ -1,4 +1,4 @@
-.modal {
+/* .modal {
     display: none;
     position: fixed;
     z-index: 1000;
@@ -32,6 +32,31 @@
     color: black;
     text-decoration: none;
     cursor: pointer;
+} */
+
+header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+header h1 {
+    font-size: 24px;
+    color: #3498db;
+    margin-bottom: 20px;
+}
+
+header ul {
+    width: 50%;
+    margin: 0 auto;
+    list-style-type: none;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    font-size: 14px;
+    gap: 10px;
+    display: grid;
+    text-align: center;
 }
 
 body {
@@ -89,11 +114,6 @@ body {
     background-color: #D6EEEE;
 }
 
-.divSelected {
-    background-color: #D6EEEE;
-    box-shadow: 0px 5px 5px rgba(72, 71, 71, 0.8);
-}
-
 .matchContainer:active {
     cursor: grabbing;
 }
@@ -102,29 +122,9 @@ body {
     border: 2px dashed #000;
 }
 
-header {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-header h1 {
-    font-size: 24px;
-    color: #3498db;
-    margin-bottom: 20px;
-}
-
-header ul {
-    width: 50%;
-    margin: 0 auto;
-    list-style-type: none;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-    font-size: 14px;
-    gap: 10px;
-    display: grid;
-    text-align: center;
+.divSelected {
+    background-color: #D6EEEE;
+    box-shadow: 0px 5px 5px rgba(72, 71, 71, 0.8);
 }
 
 .matchCardHeader {
@@ -143,6 +143,47 @@ header ul {
     font-size: large;
     margin: 0;
     text-align: center;
+}
+
+iframe {
+    width: 100%;
+    height: 290px;
+    border: none;
+    margin-bottom: 15px;
+}
+
+.periodSelector {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.periodBtn {
+    padding: 8px 16px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #333;
+}
+
+.periodBtn:hover {
+    background-color: #e0e0e0;
+}
+
+.periodBtn.selected {
+    background-color: #3498db;
+    color: white;
+    border-color: #2980b9;
+}
+
+@media (max-width: 500px) {
+    .periodBtn {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
 }
 
 .statsDiv {
@@ -226,13 +267,6 @@ footer {
 footer a {
     text-decoration: none;
     color: #333;
-}
-
-iframe {
-    width: 100%;
-    height: 290px;
-    border: none;
-    margin-bottom: 20px;
 }
 
 @media (max-width: 500px) {

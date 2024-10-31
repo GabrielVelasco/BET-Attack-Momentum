@@ -5,7 +5,7 @@ const leagueSelector = document.querySelector("#leagueSelector");
 
 let liveMatchesList = [];
 
-function _equal(a, b){
+function _equal(a, b) {
     return a === b;
 }
 
@@ -25,18 +25,47 @@ leagueSelector.addEventListener("change", (evt) => {
     });
 });
 
-document.addEventListener("click", (evt) => {
+document.addEventListener("click", async (evt) => {
     const clickedElement = evt.target;
 
     if (clickedElement.classList.contains("matchContainer")) {
         clickedElement.classList.toggle("divSelected");
+
     } else if (clickedElement.classList.contains("btnDiv")) {
         clickedElement.parentElement.classList.toggle("divSelected");
+
     } else if (clickedElement.classList.contains("closeBtn")) {
         clickedElement.closest(".matchContainer").style.display = "none";
+
     } else if (clickedElement.classList.contains("dropdownBtn")) {
         clickedElement.classList.toggle("active");
         clickedElement.nextElementSibling.classList.toggle("show");
+
+    } else if (clickedElement.classList.contains('periodBtn')) {
+        // get match ID and selected period
+        const matchCard = clickedElement.closest('.matchContainer');
+        const matchID = matchCard.id; // get match id from parent div (periodSelector div with the tree btns)
+        const selectedPeriodName = clickedElement.getAttribute('data-period'); // get period name form clicked btn
+        const selectedPeriodIndex = selectedPeriodName === 'ALL' ? 0 : selectedPeriodName === '1ST' ? 1 : 2;
+
+        try {
+            // get stats for selected period
+            const statsReturned = await getMatchStats(matchID, selectedPeriodIndex);
+            // const statsDiv = document.querySelector(`.statsDiv[id="${matchID}"]`);
+
+            if(statsReturned) {
+                const statsDiv = matchCard.querySelector('.statsDiv');
+                updateStatsTextForMatch(statsDiv, statsReturned);
+
+                // update button styles (de-select all and select clicked)
+                const periodButtonSiblings = clickedElement.parentElement.querySelectorAll('.periodBtn'); // get siblings of clicked button
+                periodButtonSiblings.forEach(btn => btn.classList.remove('selected'));
+                clickedElement.classList.add('selected');
+            }
+
+        } catch (error) {
+            console.error(`Error when updating stats (when clicking in a different period):`, error);
+        }
     }
 });
 
@@ -50,7 +79,7 @@ async function updateLiveMatchesList() {
         }
 
         console.log("Live matches array updated.");
-        
+
         return liveMatchesList;
 
     } catch (error) {
@@ -58,14 +87,14 @@ async function updateLiveMatchesList() {
     }
 }
 
-async function getMatchStats(matchID) {
-    // get all stats from all groups
+async function getMatchStats(matchID, period = 0) {
+    // get stats for a given matchID and according to a selected period (ALL, 1ST, 2ND)
 
     try {
         const response = await axios.get(`https://www.sofascore.com/api/v1/event/${matchID}/statistics`);
-        
+
         // exemple of JSON response:
-        
+
         // {
         //     "statistics": [
         //         {
@@ -101,6 +130,7 @@ async function getMatchStats(matchID) {
         //                 }
         //             ]
         //         },
+
         //         {
         //             "period": "1ST",
         //             "groups": [
@@ -122,6 +152,7 @@ async function getMatchStats(matchID) {
         //                 }
         //             ]
         //         },
+
         //         {
         //             "period": "2ND",
         //             "groups": [
@@ -146,16 +177,24 @@ async function getMatchStats(matchID) {
         //     ]
         // }        
 
-        const allStats = [];
+        // statistics[0] ==> for ALL periods || statistics[1] ==> for 1ST period || statistics[2] ==> for 2ND period.
+        const periodStats = response.data.statistics[period] || null;
+        if (periodStats){
+            const allStats = [];
 
-        // statistics[0] ==> for ALL periods. statistics[1] ==> for 1ST period. statistics[2] ==> for 2ND period.
-        response.data.statistics[0].groups.forEach(group => {
-            const groupStats = group.statisticsItems;
+            periodStats.groups.forEach(group => {
+                const groupStats = group.statisticsItems;
 
-            allStats.push(...groupStats);
-        });
+                allStats.push(...groupStats);
+                // allStats = [{ key: 'statKey', home: '39%', away: '61%' }, { key: 'statKey', home: '2.00', away: '0.59' }, ...] 
+                // array of stats objects from every group (Match overview, Shots ...) of a given selected period (ALL, 1ST, 2ND)
+            });
 
-        return allStats;
+            return allStats;
+
+        }else {
+            return null;
+        }
 
     } catch (error) {
         throw error;
@@ -166,7 +205,7 @@ function createIframeElementFor(matchID) {
     const iframeElement = document.createElement('iframe');
     iframeElement.src = `https://widgets.sofascore.com/embed/attackMomentum?id=${matchID}&widgetBackground=Gray&v=2`;
     iframeElement.scrolling = "no";
-    
+
     return iframeElement;
 }
 
@@ -186,14 +225,14 @@ async function updateScores() {
         await updateLiveMatchesList();
 
         document.querySelectorAll('h2').forEach(scoreH2 => {
-            if(scoreH2.innerText.includes('ENDED')) return;
+            if (scoreH2.innerText.includes('ENDED')) return;
 
             const matchID = Number(scoreH2.id);
             const newScore = getLiveScoreboard(matchID);
 
-            if(newScore === "ENDED") {
+            if (newScore === "ENDED") {
                 scoreH2.innerText = `${scoreH2.innerText} [ENDED]`;
-            }else if(newScore !== scoreH2.innerText) {
+            } else if (newScore !== scoreH2.innerText) {
                 scoreH2.innerText = newScore;
             }
         });
@@ -208,36 +247,78 @@ async function updateScores() {
     }
 }
 
-async function updateStats() {
+function updateStatsTextForMatch(statsDiv, statsReturned) {
+    // only change the stats values of a 'statsDiv' with a given 'statsList'
+
+    statsReturned.forEach(stat => {
+        const { key, home, away } = stat; // extract keys from statObj
+
+        const homeStatSpan = statsDiv.querySelector(`.homeTeamsStatsDiv #${key}`);
+        const awayStatSpan = statsDiv.querySelector(`.awayTeamsStatsDiv #${key}`);
+        if (homeStatSpan) homeStatSpan.innerText = home;
+        if (awayStatSpan) awayStatSpan.innerText = away;
+    });
+}
+
+function updateStatsForAll() {
+    // iterate through all statsDivs and update stats for each match
+
     const statsDivs = document.querySelectorAll('.statsDiv');
 
     statsDivs.forEach(async (statsDiv) => {
         const matchID = statsDiv.id;
 
-        try{
-            const statsReturned = await getMatchStats(matchID);
+        // get selected period (ALL, 1ST, 2ND) from the selected button (may put this in a function later...)
+        const selectedPeriodDiv = statsDiv.parentElement.querySelector('.periodSelector');
+        const selectedPeriodName = selectedPeriodDiv.querySelector('.selected').getAttribute('data-period');
+        const selectedPeriodIndex = selectedPeriodName === 'ALL' ? 0 : selectedPeriodName === '1ST' ? 1 : 2;
 
-            statsReturned.forEach(({ key, home, away }) => {
-                const homeStatSpan = statsDiv.querySelector(`.homeTeamsStatsDiv #${key}`);
-                const awayStatSpan = statsDiv.querySelector(`.awayTeamsStatsDiv #${key}`);
-                if (homeStatSpan) homeStatSpan.innerText = home;
-                if (awayStatSpan) awayStatSpan.innerText = away;
-            });
+        try {
+            const statsReturned = await getMatchStats(matchID, selectedPeriodIndex);
+
+            updateStatsTextForMatch(statsDiv, statsReturned);
 
         } catch (error) {
-            console.error(`Error at updateStats(). When requesting ${matchID} stats. Error: ${error.message}`);
+            console.error(`Error at updateStatsForAll(). When requesting ${matchID} stats. Error: ${error.message}`);
         }
     });
 
     console.log("Stats updated. Next update in 30 seconds.");
-    setTimeout(updateStats, 30000);
+    setTimeout(updateStatsForAll, 30000);
+}
+
+function createPeriodSelector(matchID) {
+    // create period selector div, add some buttons and return...
+
+    const periodSelectorDiv = document.createElement('div');
+    periodSelectorDiv.classList.add('periodSelector');
+    periodSelectorDiv.setAttribute('id', matchID);
+
+    const periods = ['ALL', '1ST', '2ND'];
+    periods.forEach(period => {
+        const button = document.createElement('button');
+
+        button.classList.add('periodBtn');
+        button.setAttribute('data-period', period);
+        button.textContent = period;
+
+        // set ALL as default selected
+        if (period === 'ALL') {
+            button.classList.add('selected');
+        }
+
+        periodSelectorDiv.appendChild(button);
+    });
+
+    return periodSelectorDiv;
 }
 
 function createMatchCard(match) {
-    const gameCard = document.createElement('div');
-    gameCard.classList.add("matchContainer");
-    gameCard.setAttribute('draggable', 'true');
-    gameCard.setAttribute('league', match.tournament.name);
+    const matchCard = document.createElement('div');
+    matchCard.classList.add("matchContainer");
+    matchCard.setAttribute('draggable', 'true');
+    matchCard.setAttribute('league', match.tournament.name);
+    matchCard.setAttribute('id', match.id);
 
     const iframeElement = createIframeElementFor(match.id);
 
@@ -253,8 +334,12 @@ function createMatchCard(match) {
     matchLiveResultH2.setAttribute("id", match.id);
     matchCardHeader.appendChild(matchLiveResultH2);
 
-    gameCard.appendChild(matchCardHeader);
-    gameCard.appendChild(iframeElement);
+    matchCard.appendChild(matchCardHeader);
+    matchCard.appendChild(iframeElement);
+
+    // add selector with tree options [ALL, 1ST, 2ND]
+    const periodSelectorDiv = createPeriodSelector(match.id);
+    matchCard.appendChild(periodSelectorDiv);
 
     const statsDiv = document.createElement('div');
     statsDiv.classList.add('statsDiv');
@@ -305,21 +390,21 @@ function createMatchCard(match) {
     statsDiv.appendChild(divHomeTeamStats);
     statsDiv.appendChild(divAwayTeamStats);
 
-    gameCard.appendChild(statsDiv);
-    
-    mainCont.appendChild(gameCard);
-    
-    addDragAndDropHandlers(gameCard);
+    matchCard.appendChild(statsDiv);
+
+    mainCont.appendChild(matchCard);
+
+    addDragAndDropHandlers(matchCard);
 }
 
-function hasPressureGraph(match){
+function hasPressureGraph(match) {
     return match.hasEventPlayerHeatMap || match.hasEventPlayerStatistics;
 }
 
-async function checkLiveMatches(){
+async function checkLiveMatches() {
     liveMatchesList.forEach(match => {
-        if(hasPressureGraph(match)){
-            if(!leagueSelector.innerHTML.includes(match.tournament.name)){
+        if (hasPressureGraph(match)) {
+            if (!leagueSelector.innerHTML.includes(match.tournament.name)) {
                 leagueSelector.innerHTML += `<option value="${match.tournament.name}">${match.tournament.name}</option>`;
             }
 
@@ -334,25 +419,25 @@ function showNewVersionModal() {
 
     modal.style.display = 'block';
 
-    closeBtn.onclick = function() {
+    closeBtn.onclick = function () {
         modal.style.display = 'none';
     }
 
-    window.onclick = function(event) {
+    window.onclick = function (event) {
         if (event.target == modal) {
             modal.style.display = 'none';
         }
     }
 }
 
-async function main(){
-    try{
+async function main() {
+    try {
         await updateLiveMatchesList();
         checkLiveMatches();
         updateScores();
-        updateStats();
-        
-    }catch (e){
+        updateStatsForAll();
+
+    } catch (e) {
         console.error(e.message);
         alert(e.message);
     }
