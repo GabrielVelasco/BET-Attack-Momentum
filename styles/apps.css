@@ -183,7 +183,7 @@ iframe {
 .statsDiv {
     display: flex;
     /* margin-bottom: 10px; */
-    font-size: medium;
+    font-size: 13px;
     width: 100%;
     gap: 10px;
 }
