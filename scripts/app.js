@@ -209,31 +209,18 @@ function createIframeElementFor(matchID) {
     return iframeElement;
 }
 
-function getLiveScoreboard(matchIdTarget) {
-    const match = liveMatchesList.find(match => match.id === matchIdTarget);
-
-    if (match) {
-        const { homeTeam, awayTeam, homeScore, awayScore } = match;
-        return `${homeTeam.shortName} [${homeScore.current}] - [${awayScore.current}] ${awayTeam.shortName}`;
-    }
-
-    return "ENDED";
-}
-
 async function updateScores() {
     try {
         await updateLiveMatchesList();
 
-        document.querySelectorAll('h2').forEach(scoreH2 => {
-            if (scoreH2.innerText.includes('ENDED')) return;
+        liveMatchesList.forEach(match => {
+            const matchID = match.id;
+            const { homeTeam, awayTeam, homeScore, awayScore } = match;
 
-            const matchID = Number(scoreH2.id);
-            const newScore = getLiveScoreboard(matchID);
-
-            if (newScore === "ENDED") {
-                scoreH2.innerText = `${scoreH2.innerText} [ENDED]`;
-            } else if (newScore !== scoreH2.innerText) {
-                scoreH2.innerText = newScore;
+            const matchh2 = document.querySelector(`h2[id="${matchID}"]`);
+            if (matchh2) {
+                const newScore = `${homeTeam.shortName} [${homeScore.current}] - [${awayScore.current}] ${awayTeam.shortName}`;
+                matchh2.innerText = newScore;
             }
         });
 
