@@ -104,7 +104,7 @@ body {
     padding: 10px;
     border-radius: 10px;
     box-shadow: 2px 2px 15px rgba(72, 71, 71, 0.815);
-    width: 540px;
+    width: 480px;
     cursor: grab;
     transition: background-color 0.3s ease;
     background-color: #fff;
