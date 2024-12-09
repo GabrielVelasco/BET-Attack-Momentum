@@ -343,7 +343,8 @@ function createMatchCard(match) {
         { key: 'passes', name: 'Passes', icon: '🔄' },
         { key: 'totalClearance', name: 'Clearances', icon: '🛡️' },
         { key: 'yellowCards', name: 'Yellow Cards', icon: '🟨' },
-        { key: 'redCards', name: 'Red Cards', icon: '🟥' }
+        { key: 'redCards', name: 'Red Cards', icon: '🟥' },
+        { key: 'touchesInOppBox', name: 'Touches in Pen. Area', icon: '🏃' }
         // quiser adc mais stats, so adicionar mais objetos aqui...
     ];
 
