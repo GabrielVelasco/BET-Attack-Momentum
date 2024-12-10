@@ -37,13 +37,10 @@ const STAT_CONFIGS_DISPLAY = [
 
 /**
  * Fetch live matches list from SofaScore API
- * @returns {Array} Array of live match objects
  */
-async function fetchLiveMatches() {
+async function refreshGlobalLiveMatchesList() {
     const response = await axios.get("https://www.sofascore.com/api/v1/sport/football/events/live");
-    const events = response.data.events || [];
-
-    return events;
+    liveMatchesList = response.data.events || [];
 }
 
 /**
@@ -244,12 +241,10 @@ function displayMatchesWithPressureGraph() {
  */
 async function updateScores() {
     try {
-        // Refresh the live matches list
-        liveMatchesList = await fetchLiveMatches();
-
         liveMatchesList.forEach(match => {
             const { id: matchID, homeTeam, awayTeam, homeScore, awayScore } = match;
             const scoreElement = document.querySelector(`h2[id="${matchID}"]`);
+
             if (scoreElement) {
                 const newScore = `${homeTeam.shortName} [${homeScore.current}] - [${awayScore.current}] ${awayTeam.shortName}`;
                 scoreElement.innerText = newScore;
@@ -259,8 +254,6 @@ async function updateScores() {
     } catch (error) {
         console.error("Error updating scores:", error.message);
         
-    } finally {
-        setTimeout(updateScores, SCORE_UPDATE_INTERVAL);
     }
 }
 
@@ -319,16 +312,23 @@ async function updateStatsForAll() {
 }
 
 /**
- * Filter matches by selected league
+ * Iterate through 'matchCard' list, deciding to hide or show match cards based on selected league
  */
 function filterMatchesByLeague(selectedLeague) {
-    const matchContainers = document.querySelectorAll('.matchContainer');
-    matchContainers.forEach(container => {
-        const league = container.getAttribute('league');
-        if (selectedLeague === 'All' || selectedLeague === league) {
-            container.style.display = 'block';
-        } else {
-            container.style.display = 'none';
+    const matchCards = document.querySelectorAll('.matchContainer');
+
+    matchCards.forEach(card => {
+        const matchLeague = card.getAttribute('league');
+
+        if (selectedLeague === 'All' || selectedLeague === matchLeague) { // show card
+            if(card.style.display === 'none'){
+                // card is hidden, show it and reload iframe
+                card.style.display = 'block';
+                card.querySelector('iframe').src = card.querySelector('iframe').src;
+            }
+
+        } else { // hide card
+            card.style.display = 'none';
         }
     });
 }
@@ -391,10 +391,18 @@ document.addEventListener("click", async (event) => {
  */
 async function main() {
     try {
-        liveMatchesList = await fetchLiveMatches();
+        await refreshGlobalLiveMatchesList();
         displayMatchesWithPressureGraph();
         updateScores();
         updateStatsForAll();
+
+        setInterval(async () => {
+            await refreshGlobalLiveMatchesList();
+            displayMatchesWithPressureGraph();
+            filterMatchesByLeague(leagueSelector.value);
+            updateScores();
+
+        }, SCORE_UPDATE_INTERVAL);      
 
     } catch (e) {
         console.error(e.message);
