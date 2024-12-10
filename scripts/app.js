@@ -172,8 +172,13 @@ function createMatchCard(match) {
     const matchCard = document.createElement('div');
     matchCard.classList.add("matchContainer");
     matchCard.setAttribute('draggable', 'true');
-    matchCard.setAttribute('league', tournament.name);
     matchCard.setAttribute('id', matchID);
+    matchCard.setAttribute('league', tournament.name);
+
+    // decides if card will be displayed or not based on league selector
+    if (leagueSelector.value !== 'All' && leagueSelector.value !== tournament.name) {
+        matchCard.style.display = 'none';
+    }
 
     // Header
     const header = document.createElement('div');
@@ -215,14 +220,15 @@ function cardAlreadyRendered(matchID) {
 }
 
 /**
- * Iterate through live matches and display those with pressure graph and not already rendered
- * Also populate the league selector with new leagues found
+ * Iterate through live matches and build a card for those with pressure graph and that are not already rendered.
+ * Also populate the league selector with new leagues found.
  */
-function displayMatchesWithPressureGraph() {
+function buildMatchCards() {
     liveMatchesList.forEach(match => {
         if (matchHasPressureGraph(match) && !cardAlreadyRendered(match.id)) {
             const leagueName = match.tournament.name;
 
+            // populate league selector with new leagues found
             if (!leagueSelector.querySelector(`option[value="${leagueName}"]`)) {
                 const option = document.createElement('option');
                 option.value = leagueName;
@@ -392,14 +398,13 @@ document.addEventListener("click", async (event) => {
 async function main() {
     try {
         await refreshGlobalLiveMatchesList();
-        displayMatchesWithPressureGraph();
+        buildMatchCards();
         updateScores();
         updateStatsForAll();
 
         setInterval(async () => {
             await refreshGlobalLiveMatchesList();
-            displayMatchesWithPressureGraph();
-            filterMatchesByLeague(leagueSelector.value);
+            buildMatchCards();
             updateScores();
 
         }, SCORE_UPDATE_INTERVAL);      
