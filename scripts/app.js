@@ -1,402 +1,237 @@
 import { addDragAndDropHandlers } from './dragAndDrop.js';
 
-const mainCont = document.querySelector(".mainContainer");
+// DOM elements
+const mainContainer = document.querySelector(".mainContainer");
 const leagueSelector = document.querySelector("#leagueSelector");
+leagueSelector.innerHTML = '<option value="All">All Leagues</option>';
 
+// Interval constants (for future easy adjustments)
+const SCORE_UPDATE_INTERVAL = 10000; // 10 seconds
+const STATS_UPDATE_INTERVAL = 30000; // 30 seconds
+
+// Global state
 let liveMatchesList = [];
 
-function _equal(a, b) {
-    return a === b;
+// Mapping for period indices
+const PERIOD_MAP = {
+    'ALL': 0,
+    '1ST': 1,
+    '2ND': 2,
+};
+
+// These are the stats we will display for each match
+const STAT_CONFIGS_DISPLAY = [
+    { key: 'ballPossession', name: 'Ball Possession', icon: '⚽' },
+    { key: 'expectedGoals', name: 'xP Goals', icon: '🥅' },
+    { key: 'bigChanceCreated', name: 'Big Chances', icon: '🎯' },
+    { key: 'totalShotsOnGoal', name: 'Total Shots', icon: '👟' },
+    { key: 'totalShotsInsideBox', name: 'Shots Inside Box', icon: '📍' },
+    { key: 'totalShotsOutsideBox', name: 'Shots Outside Box', icon: '🎯' },
+    { key: 'cornerKicks', name: 'Corners', icon: '🚩' },
+    { key: 'passes', name: 'Passes', icon: '🔄' },
+    { key: 'totalClearance', name: 'Clearances', icon: '🛡️' },
+    { key: 'yellowCards', name: 'Yellow Cards', icon: '🟨' },
+    { key: 'redCards', name: 'Red Cards', icon: '🟥' },
+    { key: 'touchesInOppBox', name: 'Touches in Pen. Area', icon: '🏃' }
+];
+
+/**
+ * Fetch live matches list from SofaScore API
+ * @returns {Array} Array of live match objects
+ */
+async function fetchLiveMatches() {
+    const response = await axios.get("https://www.sofascore.com/api/v1/sport/football/events/live");
+    const events = response.data.events || [];
+
+    return events;
 }
 
-leagueSelector.addEventListener("change", (evt) => {
-    const selectedLeague = evt.target.value;
-    const matchContainers = document.querySelectorAll('.matchContainer');
+/**
+ * Fetch match statistics by match ID and period index
+ * @param {Number} matchID 
+ * @param {Number} periodIndex 
+ * @returns {Array|null} Returns array of stats objects or null if none found
+ */
+async function fetchMatchStats(matchID, periodIndex = 0) {
+    const response = await axios.get(`https://www.sofascore.com/api/v1/event/${matchID}/statistics`);
+    const statsData = response.data.statistics || [];
 
-    matchContainers.forEach((matchContainer) => {
-        const league = matchContainer.getAttribute('league');
+    // Get stats for the specified period
+    const periodStats = statsData[periodIndex] || null;
+    if (!periodStats) return null;
 
-        if (_equal(selectedLeague, "All") || _equal(selectedLeague, league)) {
-            matchContainer.style.display = "block";
-            matchContainer.querySelector('iframe').src = matchContainer.querySelector('iframe').src;
-        } else {
-            matchContainer.style.display = "none";
-        }
-    });
-});
+    // Flatten groups of statistics into one array
+    const allStats = periodStats.groups.reduce((acc, group) => {
+        return acc.concat(group.statisticsItems);
+    }, []);
 
-document.addEventListener("click", async (evt) => {
-    const clickedElement = evt.target;
-
-    if (clickedElement.classList.contains("matchContainer")) {
-        clickedElement.classList.toggle("divSelected");
-
-    } else if (clickedElement.classList.contains("btnDiv")) {
-        clickedElement.parentElement.classList.toggle("divSelected");
-
-    } else if (clickedElement.classList.contains("closeBtn")) {
-        clickedElement.closest(".matchContainer").style.display = "none";
-
-    } else if (clickedElement.classList.contains("dropdownBtn")) {
-        clickedElement.classList.toggle("active");
-        clickedElement.nextElementSibling.classList.toggle("show");
-
-    } else if (clickedElement.classList.contains('periodBtn')) {
-        // get match ID and selected period
-        const matchCard = clickedElement.closest('.matchContainer');
-        const matchID = matchCard.id; // get match id from parent div (periodSelector div with the tree btns)
-        const selectedPeriodName = clickedElement.getAttribute('data-period'); // get period name form clicked btn
-        const selectedPeriodIndex = selectedPeriodName === 'ALL' ? 0 : selectedPeriodName === '1ST' ? 1 : 2;
-
-        try {
-            // get stats for selected period
-            const statsReturned = await getMatchStats(matchID, selectedPeriodIndex);
-            // const statsDiv = document.querySelector(`.statsDiv[id="${matchID}"]`);
-
-            if(statsReturned) {
-                const statsDiv = matchCard.querySelector('.statsDiv');
-                updateStatsTextForMatch(statsDiv, statsReturned);
-
-                // update button styles (de-select all and select clicked)
-                const periodButtonSiblings = clickedElement.parentElement.querySelectorAll('.periodBtn'); // get siblings of clicked button
-                periodButtonSiblings.forEach(btn => btn.classList.remove('selected'));
-                clickedElement.classList.add('selected');
-            }
-
-        } catch (error) {
-            console.error(`Error when updating stats (when clicking in a different period):`, error);
-        }
-    }
-});
-
-async function updateLiveMatchesList() {
-    try {
-        const response = await axios.get("https://www.sofascore.com/api/v1/sport/football/events/live");
-        liveMatchesList = response.data.events;
-
-        if (liveMatchesList.length === 0) {
-            throw new Error("At updateLiveMatchesList(). No live matches at the moment.");
-        }
-
-        console.log("Live matches array updated.");
-
-        return liveMatchesList;
-
-    } catch (error) {
-        throw error;
-    }
+    return allStats;
 }
 
-async function getMatchStats(matchID, period = 0) {
-    // get stats for a given matchID and according to a selected period (ALL, 1ST, 2ND)
-
-    try {
-        const response = await axios.get(`https://www.sofascore.com/api/v1/event/${matchID}/statistics`);
-
-        // exemple of JSON response:
-
-        // {
-        //     "statistics": [
-        //         {
-        //             "period": "ALL",
-        //             "groups": [
-        //                 {
-        //                     "groupName": "Match overview",
-        //                     "statisticsItems": [
-        //                         { "name": "Ball possession", "home": "39%", "away": "61%" },
-        //                         { "name": "Expected goals", "home": "2.00", "away": "0.59" },
-        //                         { "name": "Big chances", "home": "4", "away": "0" },
-        //                         { "name": "Total shots", "home": "20", "away": "8" },
-        //                         { "name": "Goalkeeper saves", "home": "1", "away": "4" }
-        //                         ...
-        //                     ]
-        //                 },
-        //                 {
-        //                     "groupName": "Shots",
-        //                     "statisticsItems": [
-        //                         { "name": "Total shots", "home": "20", "away": "8" },
-        //                         { "name": "Shots on target", "home": "6", "away": "2" },
-        //                         { "name": "Shots off target", "home": "9", "away": "5" }
-        //                         ...
-        //                     ]
-        //                 },
-        //                 {
-        //                     "groupName": "Attack",
-        //                     "statisticsItems": [
-        //                         { "name": "Big chances scored", "home": "1", "away": "0" },
-        //                         { "name": "Touches in penalty area", "home": "27", "away": "15" }
-        //                         ...
-        //                     ]
-        //                 }
-        //             ]
-        //         },
-
-        //         {
-        //             "period": "1ST",
-        //             "groups": [
-        //                 {
-        //                     "groupName": "Match overview",
-        //                     "statisticsItems": [
-        //                         { "name": "Ball possession", "home": "42%", "away": "58%" },
-        //                         { "name": "Expected goals", "home": "0.76", "away": "0.15" }
-        //                         ...
-        //                     ]
-        //                 },
-        //                 {
-        //                     "groupName": "Shots",
-        //                     "statisticsItems": [
-        //                         { "name": "Total shots", "home": "12", "away": "2" },
-        //                         { "name": "Shots on target", "home": "4", "away": "1" }
-        //                         ...
-        //                     ]
-        //                 }
-        //             ]
-        //         },
-
-        //         {
-        //             "period": "2ND",
-        //             "groups": [
-        //                 {
-        //                     "groupName": "Match overview",
-        //                     "statisticsItems": [
-        //                         { "name": "Ball possession", "home": "37%", "away": "63%" },
-        //                         { "name": "Expected goals", "home": "1.24", "away": "0.44" }
-        //                         ...
-        //                     ]
-        //                 },
-        //                 {
-        //                     "groupName": "Shots",
-        //                     "statisticsItems": [
-        //                         { "name": "Total shots", "home": "8", "away": "6" },
-        //                         { "name": "Shots on target", "home": "2", "away": "1" }
-        //                         ...
-        //                     ]
-        //                 }
-        //             ]
-        //         }
-        //     ]
-        // }        
-
-        // statistics[0] ==> for ALL periods || statistics[1] ==> for 1ST period || statistics[2] ==> for 2ND period.
-        const periodStats = response.data.statistics[period] || null;
-        if (periodStats){
-            const allStats = [];
-
-            periodStats.groups.forEach(group => {
-                const groupStats = group.statisticsItems;
-
-                allStats.push(...groupStats);
-                // allStats = [{ key: 'statKey', home: '39%', away: '61%' }, { key: 'statKey', home: '2.00', away: '0.59' }, ...] 
-                // array of stats objects from every group (Match overview, Shots ...) of a given selected period (ALL, 1ST, 2ND)
-            });
-
-            return allStats;
-
-        }else {
-            return null;
-        }
-
-    } catch (error) {
-        throw error;
-    }
-}
-
-function createIframeElementFor(matchID) {
-    const iframeElement = document.createElement('iframe');
-    iframeElement.src = `https://widgets.sofascore.com/embed/attackMomentum?id=${matchID}&widgetBackground=Gray&v=2`;
-    iframeElement.scrolling = "no";
-
-    return iframeElement;
-}
-
-async function updateScores() {
-    try {
-        await updateLiveMatchesList();
-
-        liveMatchesList.forEach(match => {
-            const matchID = match.id;
-            const { homeTeam, awayTeam, homeScore, awayScore } = match;
-
-            const matchh2 = document.querySelector(`h2[id="${matchID}"]`);
-            if (matchh2) {
-                const newScore = `${homeTeam.shortName} [${homeScore.current}] - [${awayScore.current}] ${awayTeam.shortName}`;
-                matchh2.innerText = newScore;
-            }
-        });
-
-        console.log("Scoreboards updated. Next update in 10 seconds.");
-
-    } catch (error) {
-        console.error("Error when running updateScores(): ", error.message);
-
-    } finally {
-        setTimeout(updateScores, 10000);
-    }
-}
-
-function updateStatsTextForMatch(statsDiv, statsReturned) {
-    // only change the stats values of a 'statsDiv' with a given 'statsList'
-
-    statsReturned.forEach(stat => {
-        const { key, home, away } = stat; // extract keys from statObj
-
-        const homeStatSpan = statsDiv.querySelector(`.homeTeamsStatsDiv #${key}`);
-        const awayStatSpan = statsDiv.querySelector(`.awayTeamsStatsDiv #${key}`);
-        if (homeStatSpan) homeStatSpan.innerText = home;
-        if (awayStatSpan) awayStatSpan.innerText = away;
-    });
-}
-
-function updateStatsForAll() {
-    // iterate through all statsDivs and update stats for each match
-
-    const statsDivs = document.querySelectorAll('.statsDiv');
-
-    statsDivs.forEach(async (statsDiv) => {
-        const matchID = statsDiv.id;
-
-        // get selected period (ALL, 1ST, 2ND) from the selected button (may put this in a function later...)
-        const selectedPeriodDiv = statsDiv.parentElement.querySelector('.periodSelector');
-        const selectedPeriodName = selectedPeriodDiv.querySelector('.selected').getAttribute('data-period');
-        const selectedPeriodIndex = selectedPeriodName === 'ALL' ? 0 : selectedPeriodName === '1ST' ? 1 : 2;
-
-        try {
-            const statsReturned = await getMatchStats(matchID, selectedPeriodIndex);
-
-            updateStatsTextForMatch(statsDiv, statsReturned);
-
-        } catch (error) {
-            console.error(`Error at updateStatsForAll(). When requesting ${matchID} stats. Error: ${error.message}`);
-        }
-    });
-
-    console.log("Stats updated. Next update in 30 seconds.");
-    setTimeout(updateStatsForAll, 30000);
-}
-
-function createPeriodSelector(matchID) {
-    // create period selector div, add some buttons and return...
-
-    const periodSelectorDiv = document.createElement('div');
-    periodSelectorDiv.classList.add('periodSelector');
-    periodSelectorDiv.setAttribute('id', matchID);
-
-    const periods = ['ALL', '1ST', '2ND'];
-    periods.forEach(period => {
-        const button = document.createElement('button');
-
-        button.classList.add('periodBtn');
-        button.setAttribute('data-period', period);
-        button.textContent = period;
-
-        // set ALL as default selected
-        if (period === 'ALL') {
-            button.classList.add('selected');
-        }
-
-        periodSelectorDiv.appendChild(button);
-    });
-
-    return periodSelectorDiv;
-}
-
-function createMatchCard(match) {
-    const matchCard = document.createElement('div');
-    matchCard.classList.add("matchContainer");
-    matchCard.setAttribute('draggable', 'true');
-    matchCard.setAttribute('league', match.tournament.name);
-    matchCard.setAttribute('id', match.id);
-
-    const iframeElement = createIframeElementFor(match.id);
-
-    const matchCardHeader = document.createElement('div');
-    matchCardHeader.classList.add('matchCardHeader');
-
-    const btnRemoveCard = document.createElement('button');
-    btnRemoveCard.classList.add('closeBtn');
-    btnRemoveCard.innerText = "X";
-    matchCardHeader.appendChild(btnRemoveCard);
-
-    const matchLiveResultH2 = document.createElement('h2');
-    matchLiveResultH2.setAttribute("id", match.id);
-    matchCardHeader.appendChild(matchLiveResultH2);
-
-    matchCard.appendChild(matchCardHeader);
-    matchCard.appendChild(iframeElement);
-
-    // add selector with tree options [ALL, 1ST, 2ND]
-    const periodSelectorDiv = createPeriodSelector(match.id);
-    matchCard.appendChild(periodSelectorDiv);
-
-    const statsDiv = document.createElement('div');
-    statsDiv.classList.add('statsDiv');
-    statsDiv.setAttribute('id', match.id);
-
-    const statConfigs = [
-        { key: 'ballPossession', name: 'Ball Possession', icon: '⚽' },
-        { key: 'expectedGoals', name: 'xP Goals', icon: '🥅' },
-        { key: 'bigChanceCreated', name: 'Big Chances', icon: '🎯' },
-        { key: 'totalShotsOnGoal', name: 'Total Shots', icon: '👟' },
-        { key: 'totalShotsInsideBox', name: 'Shots Inside Box', icon: '📍' },
-        { key: 'totalShotsOutsideBox', name: 'Shots Outside Box', icon: '🎯' },
-        { key: 'cornerKicks', name: 'Corners', icon: '🚩' },
-        { key: 'passes', name: 'Passes', icon: '🔄' },
-        { key: 'totalClearance', name: 'Clearances', icon: '🛡️' },
-        { key: 'yellowCards', name: 'Yellow Cards', icon: '🟨' },
-        { key: 'redCards', name: 'Red Cards', icon: '🟥' },
-        { key: 'touchesInOppBox', name: 'Touches in Pen. Area', icon: '🏃' }
-        // quiser adc mais stats, so adicionar mais objetos aqui...
-    ];
-
-    const divHomeTeamStats = document.createElement('div');
-    divHomeTeamStats.classList.add('homeTeamsStatsDiv');
-
-    const divAwayTeamStats = document.createElement('div');
-    divAwayTeamStats.classList.add('awayTeamsStatsDiv');
-
-    statConfigs.forEach(stat => {
-        const homeStatDiv = document.createElement('div');
-        const homeStatIcon = document.createElement('span');
-        homeStatIcon.textContent = stat.icon;
-        const homeStatName = document.createElement('p');
-        homeStatName.textContent = stat.name;
-        const homeStatValue = document.createElement('span');
-        homeStatValue.id = stat.key;
-        homeStatValue.textContent = '-';
-        homeStatDiv.append(homeStatIcon, homeStatName, homeStatValue);
-        divHomeTeamStats.appendChild(homeStatDiv);
-
-        const awayStatDiv = document.createElement('div');
-        const awayStatIcon = document.createElement('span');
-        awayStatIcon.textContent = stat.icon;
-        const awayStatName = document.createElement('p');
-        awayStatName.textContent = stat.name;
-        const awayStatValue = document.createElement('span');
-        awayStatValue.id = stat.key;
-        awayStatValue.textContent = '-';
-        awayStatDiv.append(awayStatValue, awayStatName, awayStatIcon);
-        divAwayTeamStats.appendChild(awayStatDiv);
-    });
-
-    statsDiv.appendChild(divHomeTeamStats);
-    statsDiv.appendChild(divAwayTeamStats);
-
-    matchCard.appendChild(statsDiv);
-
-    mainCont.appendChild(matchCard);
-
-    addDragAndDropHandlers(matchCard);
-}
-
-function hasPressureGraph(match) {
+/**
+ * Check if the match provides a pressure graph (attack momentum)
+ * @param {Object} match 
+ * @returns {Boolean}
+ */
+function matchHasPressureGraph(match) {
+    // Adjust condition if needed based on actual API response
     return match.hasEventPlayerHeatMap || match.hasEventPlayerStatistics;
 }
 
-async function checkLiveMatches() {
+/**
+ * Create an iframe element for a given match ID
+ * @param {Number} matchID 
+ * @returns {HTMLElement} iframe element
+ */
+function createIframeElementFor(matchID) {
+    const iframe = document.createElement('iframe');
+    iframe.src = `https://widgets.sofascore.com/embed/attackMomentum?id=${matchID}&widgetBackground=Gray&v=2`;
+    iframe.scrolling = "no";
+
+    return iframe;
+}
+
+/**
+ * Create the period selector (ALL, 1ST, 2ND) for a match
+ * @param {Number} matchID 
+ * @returns {HTMLElement} period selector div
+ */
+function createPeriodSelector(matchID) {
+    const periodSelector = document.createElement('div');
+    periodSelector.classList.add('periodSelector');
+    periodSelector.setAttribute('id', matchID);
+
+    ['ALL', '1ST', '2ND'].forEach(period => {
+        const button = document.createElement('button');
+        button.classList.add('periodBtn');
+        button.setAttribute('data-period', period);
+        button.textContent = period;
+        if (period === 'ALL') {
+            button.classList.add('selected');
+        }
+        periodSelector.appendChild(button);
+    });
+
+    return periodSelector;
+}
+
+/**
+ * Create the stats div that holds both home and away stats
+ * @param {Number} matchID 
+ * @returns {HTMLElement} statsDiv element
+ */
+function createStatsDiv(matchID) {
+    const statsDiv = document.createElement('div');
+    statsDiv.classList.add('statsDiv');
+    statsDiv.setAttribute('id', matchID);
+
+    const homeStatsDiv = document.createElement('div');
+    homeStatsDiv.classList.add('homeTeamsStatsDiv');
+
+    const awayStatsDiv = document.createElement('div');
+    awayStatsDiv.classList.add('awayTeamsStatsDiv');
+
+    STAT_CONFIGS_DISPLAY.forEach(stat => {
+        const { key, name, icon } = stat;
+
+        // Home stat line
+        const homeStatLine = document.createElement('div');
+        const homeIcon = document.createElement('span');
+        homeIcon.textContent = icon;
+        const homeName = document.createElement('p');
+        homeName.textContent = name;
+        const homeValue = document.createElement('span');
+        homeValue.id = key;
+        homeValue.textContent = '-';
+        homeStatLine.append(homeIcon, homeName, homeValue);
+        homeStatsDiv.appendChild(homeStatLine);
+
+        // Away stat line
+        const awayStatLine = document.createElement('div');
+        const awayValue = document.createElement('span');
+        awayValue.id = key;
+        awayValue.textContent = '-';
+        const awayName = document.createElement('p');
+        awayName.textContent = name;
+        const awayIcon = document.createElement('span');
+        awayIcon.textContent = icon;
+        awayStatLine.append(awayValue, awayName, awayIcon);
+        awayStatsDiv.appendChild(awayStatLine);
+    });
+
+    statsDiv.appendChild(homeStatsDiv);
+    statsDiv.appendChild(awayStatsDiv);
+
+    return statsDiv;
+}
+
+/**
+ * Create a match card
+ * @param {Object} match - Match object from the liveMatchesList
+ */
+function createMatchCard(match) {
+    const { id: matchID, tournament } = match;
+
+    const matchCard = document.createElement('div');
+    matchCard.classList.add("matchContainer");
+    matchCard.setAttribute('draggable', 'true');
+    matchCard.setAttribute('league', tournament.name);
+    matchCard.setAttribute('id', matchID);
+
+    // Header
+    const header = document.createElement('div');
+    header.classList.add('matchCardHeader');
+
+    const closeBtn = document.createElement('button');
+    closeBtn.classList.add('closeBtn');
+    closeBtn.innerText = "X";
+    header.appendChild(closeBtn);
+
+    const scoreH2 = document.createElement('h2');
+    scoreH2.setAttribute("id", matchID);
+    header.appendChild(scoreH2);
+
+    // Iframe
+    const iframeElement = createIframeElementFor(matchID);
+
+    // Period selector
+    const periodSelectorDiv = createPeriodSelector(matchID);
+
+    // Stats Div
+    const statsDiv = createStatsDiv(matchID);
+
+    // Append elements to matchCard
+    matchCard.append(header, iframeElement, periodSelectorDiv, statsDiv);
+    mainContainer.appendChild(matchCard);
+
+    // Add drag and drop handlers
+    addDragAndDropHandlers(matchCard);
+}
+
+/**
+ * Check if a match card is already rendered
+ * @param {Number} matchID
+ * @returns {Boolean}
+ */
+function cardAlreadyRendered(matchID) {
+    return document.getElementById(matchID);
+}
+
+/**
+ * Iterate through live matches and display those with pressure graph and not already rendered
+ * Also populate the league selector with new leagues found
+ */
+function displayMatchesWithPressureGraph() {
     liveMatchesList.forEach(match => {
-        if (hasPressureGraph(match)) {
-            if (!leagueSelector.innerHTML.includes(match.tournament.name)) {
-                leagueSelector.innerHTML += `<option value="${match.tournament.name}">${match.tournament.name}</option>`;
+        if (matchHasPressureGraph(match) && !cardAlreadyRendered(match.id)) {
+            const leagueName = match.tournament.name;
+
+            if (!leagueSelector.querySelector(`option[value="${leagueName}"]`)) {
+                const option = document.createElement('option');
+                option.value = leagueName;
+                option.textContent = leagueName;
+
+                leagueSelector.appendChild(option);
             }
 
             createMatchCard(match);
@@ -404,27 +239,160 @@ async function checkLiveMatches() {
     });
 }
 
-function showNewVersionModal() {
-    const modal = document.getElementById('newVersionModal');
-    const closeBtn = modal.querySelector('.close-modal');
+/**
+ * Update scoreboards for all live matches displayed
+ */
+async function updateScores() {
+    try {
+        // Refresh the live matches list
+        liveMatchesList = await fetchLiveMatches();
 
-    modal.style.display = 'block';
+        liveMatchesList.forEach(match => {
+            const { id: matchID, homeTeam, awayTeam, homeScore, awayScore } = match;
+            const scoreElement = document.querySelector(`h2[id="${matchID}"]`);
+            if (scoreElement) {
+                const newScore = `${homeTeam.shortName} [${homeScore.current}] - [${awayScore.current}] ${awayTeam.shortName}`;
+                scoreElement.innerText = newScore;
+            }
+        });
 
-    closeBtn.onclick = function () {
-        modal.style.display = 'none';
-    }
-
-    window.onclick = function (event) {
-        if (event.target == modal) {
-            modal.style.display = 'none';
-        }
+    } catch (error) {
+        console.error("Error updating scores:", error.message);
+        
+    } finally {
+        setTimeout(updateScores, SCORE_UPDATE_INTERVAL);
     }
 }
 
+/**
+ * Update stats content for a single match (replace the text content of the spans)
+ * @param {HTMLElement} statsDiv - The stats div element, containing home and away stats divs
+ * @param {Array} statsArray - Array of stats objects returned from the API
+ */
+function updateStatsTextForMatch(statsDiv, statsArray) {
+    if (!statsArray) return;
+
+    statsArray.forEach(stat => {
+        const { key, home, away } = stat;
+
+        // Check if specific stat is set to be displayed
+        const config = STAT_CONFIGS_DISPLAY.find(c => c.key === key);
+        if (!config) return; // Skip this stat (not supposed to be displayed)
+
+        const homeStatSpan = statsDiv.querySelector(`.homeTeamsStatsDiv #${key}`);
+        const awayStatSpan = statsDiv.querySelector(`.awayTeamsStatsDiv #${key}`);
+
+        if (homeStatSpan) homeStatSpan.innerText = home;
+        if (awayStatSpan) awayStatSpan.innerText = away;
+    });
+}
+
+/**
+ * Update stats for all displayed matches
+ */
+async function updateStatsForAll() {
+    const statsDivs = document.querySelectorAll('.statsDiv');
+
+    for (const statsDiv of statsDivs) {
+        const matchID = statsDiv.id;
+
+        const periodSelector = statsDiv.parentElement.querySelector('.periodSelector');
+        const selectedButton = periodSelector.querySelector('.selected');
+        const selectedPeriodName = selectedButton.getAttribute('data-period');
+        const periodIndex = PERIOD_MAP[selectedPeriodName];
+
+        try {
+            const statsData = await fetchMatchStats(matchID, periodIndex);
+
+            if (statsData) {
+                updateStatsTextForMatch(statsDiv, statsData);
+            }
+
+        } catch (error) {
+            console.error(`Error updating stats for match ${matchID}: ${error.message}`);
+        }
+    }
+
+    console.log("Stats updated. Next update in 30 seconds.");
+
+    setTimeout(updateStatsForAll, STATS_UPDATE_INTERVAL);
+}
+
+/**
+ * Filter matches by selected league
+ */
+function filterMatchesByLeague(selectedLeague) {
+    const matchContainers = document.querySelectorAll('.matchContainer');
+    matchContainers.forEach(container => {
+        const league = container.getAttribute('league');
+        if (selectedLeague === 'All' || selectedLeague === league) {
+            container.style.display = 'block';
+        } else {
+            container.style.display = 'none';
+        }
+    });
+}
+
+/**
+ * Event Listeners
+ */
+
+// Handle league selection change
+leagueSelector.addEventListener("change", (event) => {
+    const selectedLeague = event.target.value;
+    filterMatchesByLeague(selectedLeague);
+});
+
+// Handle click events for various functionalities
+document.addEventListener("click", async (event) => {
+    const target = event.target;
+
+    if (target.classList.contains("matchContainer")) {
+        // Toggle selection of match container
+        target.classList.toggle("divSelected");
+
+    } else if (target.classList.contains("btnDiv")) {
+        target.parentElement.classList.toggle("divSelected");
+
+    } else if (target.classList.contains("closeBtn")) {
+        // Close this match card
+        target.closest(".matchContainer").style.display = "none";
+
+    } else if (target.classList.contains("dropdownBtn")) {
+        target.classList.toggle("active");
+        target.nextElementSibling.classList.toggle("show");
+
+    } else if (target.classList.contains('periodBtn')) {
+        // Period button clicked, fetch and update stats for that match and period
+        const matchCard = target.closest('.matchContainer');
+        const matchID = matchCard.id;
+        const selectedPeriodName = target.getAttribute('data-period');
+        const periodIndex = PERIOD_MAP[selectedPeriodName];
+
+        try {
+            const statsData = await fetchMatchStats(matchID, periodIndex);
+            if (statsData) {
+                const statsDiv = matchCard.querySelector('.statsDiv');
+                updateStatsTextForMatch(statsDiv, statsData);
+
+                // Update button styling
+                const siblingButtons = target.parentElement.querySelectorAll('.periodBtn');
+                siblingButtons.forEach(btn => btn.classList.remove('selected'));
+                target.classList.add('selected');
+            }
+        } catch (error) {
+            console.error(`Error when updating stats for match ${matchID}:`, error);
+        }
+    }
+});
+
+/**
+ * Main initialization function
+ */
 async function main() {
     try {
-        await updateLiveMatchesList();
-        checkLiveMatches();
+        liveMatchesList = await fetchLiveMatches();
+        displayMatchesWithPressureGraph();
         updateScores();
         updateStatsForAll();
 
@@ -434,4 +402,5 @@ async function main() {
     }
 }
 
-main();
+// Run the main function once the DOM is fully loaded
+document.addEventListener("DOMContentLoaded", main);
