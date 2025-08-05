@@ -1,4 +1,5 @@
 import { addDragAndDropHandlers } from './dragAndDrop.js';
+import { makeApiRequest } from './apiConfig.js';
 
 const mainCont = document.querySelector(".mainContainer");
 const leagueSelector = document.querySelector("#leagueSelector");
@@ -71,7 +72,7 @@ document.addEventListener("click", async (evt) => {
 
 async function updateLiveMatchesList() {
     try {
-        const response = await axios.get("https://www.sofascore.com/api/v1/sport/football/events/live");
+        const response = await makeApiRequest("/api/v1/sport/football/events/live");
         liveMatchesList = response.data.events;
 
         if (liveMatchesList.length === 0) {
@@ -91,7 +92,7 @@ async function getMatchStats(matchID, period = 0) {
     // get stats for a given matchID and according to a selected period (ALL, 1ST, 2ND)
 
     try {
-        const response = await axios.get(`https://www.sofascore.com/api/v1/event/${matchID}/statistics`);
+        const response = await makeApiRequest(`/api/v1/event/${matchID}/statistics`);
 
         // exemple of JSON response:
 

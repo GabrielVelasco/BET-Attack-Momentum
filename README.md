@@ -21,5 +21,5 @@ Help bettors to find a good match for goal/corners based on the pressure graphs 
 | ------------------------------------------------ | ------------------------------------------------------------ |
 | VS Code | IDE |
 | Axios   | For requests |
-| SofaScore API | To get live matches |
-| [my-proxy](https://github.com/GabrielVelasco/my-proxy) | API created to intermediate requests to SofaScore API (Later used for other purposes...) |
+| SportsAPI7 (RapidAPI) | To get live matches and statistics |
+| SofaScore Widgets | For attack momentum graphs |
