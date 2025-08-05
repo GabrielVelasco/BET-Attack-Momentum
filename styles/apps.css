@@ -46,7 +46,7 @@ header h1 {
 }
 
 header ul {
-    width: 50%;
+    max-width: 720px;
     margin: 0 auto;
     list-style-type: none;
     padding: 20px;
@@ -96,6 +96,7 @@ body {
     align-items: center;
     flex-wrap: wrap;
     gap: 30px;
+    margin: 5px ;
 }
 
 .matchContainer {
@@ -104,10 +105,11 @@ body {
     padding: 10px;
     border-radius: 10px;
     box-shadow: 2px 2px 15px rgba(72, 71, 71, 0.815);
-    width: 480px;
+    max-width: 515px;
     cursor: grab;
     transition: background-color 0.3s ease;
     background-color: #fff;
+    flex-grow: 1;
 }
 
 .matchContainer:hover {

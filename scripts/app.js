@@ -4,6 +4,9 @@ import { makeApiRequest } from './apiConfig.js';
 const mainCont = document.querySelector(".mainContainer");
 const leagueSelector = document.querySelector("#leagueSelector");
 
+const scoreUpdateInterval = 60000; // 60 seconds
+const statsUpdateInterval = 60000; // 60 seconds
+
 let liveMatchesList = [];
 
 function _equal(a, b) {
@@ -72,7 +75,7 @@ document.addEventListener("click", async (evt) => {
 
 async function updateLiveMatchesList() {
     try {
-        const response = await makeApiRequest("/api/v1/sport/football/events/live");
+        const response = await makeApiRequest("/tournaments/get-live-events?sport=football");
         liveMatchesList = response.data.events;
 
         if (liveMatchesList.length === 0) {
@@ -92,7 +95,7 @@ async function getMatchStats(matchID, period = 0) {
     // get stats for a given matchID and according to a selected period (ALL, 1ST, 2ND)
 
     try {
-        const response = await makeApiRequest(`/api/v1/event/${matchID}/statistics`);
+        const response = await makeApiRequest(`/matches/get-statistics?matchId=${matchID}`);
 
         // exemple of JSON response:
 
@@ -225,13 +228,13 @@ async function updateScores() {
             }
         });
 
-        console.log("Scoreboards updated. Next update in 10 seconds.");
+        console.log("Scoreboards updated. Next update in 60 seconds.");
 
     } catch (error) {
         console.error("Error when running updateScores(): ", error.message);
 
     } finally {
-        setTimeout(updateScores, 10000);
+        setTimeout(updateScores, scoreUpdateInterval);
     }
 }
 
@@ -271,8 +274,9 @@ function updateStatsForAll() {
         }
     });
 
-    console.log("Stats updated. Next update in 30 seconds.");
-    setTimeout(updateStatsForAll, 30000);
+    console.log("Stats updated. Next update in 60 seconds.");
+
+    setTimeout(updateStatsForAll, statsUpdateInterval);
 }
 
 function createPeriodSelector(matchID) {
