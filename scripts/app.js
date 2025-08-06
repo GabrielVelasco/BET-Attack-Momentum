@@ -1,5 +1,5 @@
 import { addDragAndDropHandlers } from './dragAndDrop.js';
-import { makeApiRequest } from './apiConfig.js';
+import { makeApiRequest, REQ_OF_TYPE_LIVE_LIST } from './apiConfig.js';
 
 const mainCont = document.querySelector(".mainContainer");
 const leagueSelector = document.querySelector("#leagueSelector");
@@ -75,7 +75,7 @@ document.addEventListener("click", async (evt) => {
 
 async function updateLiveMatchesList() {
     try {
-        const response = await makeApiRequest("/tournaments/get-live-events?sport=football");
+        const response = await makeApiRequest(REQ_OF_TYPE_LIVE_LIST);
         liveMatchesList = response.data.events;
 
         if (liveMatchesList.length === 0) {
@@ -95,7 +95,7 @@ async function getMatchStats(matchID, period = 0) {
     // get stats for a given matchID and according to a selected period (ALL, 1ST, 2ND)
 
     try {
-        const response = await makeApiRequest(`/matches/get-statistics?matchId=${matchID}`);
+        const response = await makeApiRequest(matchID);
 
         // exemple of JSON response:
 

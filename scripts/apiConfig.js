@@ -4,19 +4,34 @@
 // 2. Implementing API key rotation
 // 3. Setting up proper CORS and request limits
 
-const API_CONFIG = {
-    baseUrl: 'https://sofascore.p.rapidapi.com',
+const REQ_OF_TYPE_LIVE_LIST = "liveList";
 
-    headers: {
-        "x-rapidapi-host": "sofascore.p.rapidapi.com",
-        "x-rapidapi-key": "b4b151e2fbmsh0b2dbc04a6a57a7p1b893fjsn15926766fa9e",
-        "x-rapidapi-ua": "RapidAPI-Playground"
-    }
+const API_CONFIG = {
+    baseUrl: 'http://localhost:3000',
+
+    // headers: {
+    //     "x-rapidapi-host": "sofascore.p.rapidapi.com",
+    //     "x-rapidapi-key": "blablabla",
+    //     "x-rapidapi-ua": "RapidAPI-Playground"
+    // }
 };
 
 // Helper function to make API requests
-async function makeApiRequest(endpoint) {
-    return await axios.get(`${API_CONFIG.baseUrl}${endpoint}`, API_CONFIG);
+async function makeApiRequest(reqTypeInfo) {
+
+    try{
+        if(reqTypeInfo === REQ_OF_TYPE_LIVE_LIST) { 
+            return await axios.get(`${API_CONFIG.baseUrl}/live-events`);
+
+        }else {
+            const matchID = reqTypeInfo;
+            return await axios.get(`${API_CONFIG.baseUrl}/live-stats/${matchID}`);
+        }
+
+    }catch (error) {
+        console.error(`Error making API request:`, error);
+        throw error;
+    }
 }
 
-export { makeApiRequest };
+export { makeApiRequest, REQ_OF_TYPE_LIVE_LIST };
