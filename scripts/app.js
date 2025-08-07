@@ -4,8 +4,8 @@ import { makeApiRequest, REQ_OF_TYPE_LIVE_LIST } from './apiConfig.js';
 const mainCont = document.querySelector(".mainContainer");
 const leagueSelector = document.querySelector("#leagueSelector");
 
-const scoreUpdateInterval = 60000; // 60 seconds
-const statsUpdateInterval = 60000; // 60 seconds
+const scoreUpdateInterval = 30000; // 30 seconds (instead of 10)
+const statsUpdateInterval = 60000; // 60 seconds (instead of 30)
 
 let liveMatchesList = [];
 
