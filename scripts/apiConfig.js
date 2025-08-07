@@ -1,13 +1,7 @@
-// API Configuration
-// WARNING: This is a client-side application. In production, consider:
-// 1. Using a backend proxy to hide the API key
-// 2. Implementing API key rotation
-// 3. Setting up proper CORS and request limits
-
 const REQ_OF_TYPE_LIVE_LIST = "liveList";
 
 const API_CONFIG = {
-    baseUrl: 'http://localhost:3000',
+    baseUrl: 'https://sc-proxy-16087676324.europe-west1.run.app',
 
     // headers: {
     //     "x-rapidapi-host": "sofascore.p.rapidapi.com",
