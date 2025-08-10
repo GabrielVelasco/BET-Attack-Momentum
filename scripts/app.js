@@ -1,7 +1,7 @@
 import { addDragAndDropHandlers } from './dragAndDrop.js';
 import { makeApiRequest, REQ_OF_TYPE_LIVE_LIST } from './apiConfig.js';
 
-const mainCont = document.querySelector(".mainContainer");
+const mainCont = document.querySelector(".main-container");
 const leagueSelector = document.querySelector("#leagueSelector");
 
 const scoreUpdateInterval = 30000; // 30 seconds (instead of 10)
@@ -15,7 +15,7 @@ function _equal(a, b) {
 
 leagueSelector.addEventListener("change", (evt) => {
     const selectedLeague = evt.target.value;
-    const matchContainers = document.querySelectorAll('.matchContainer');
+    const matchContainers = document.querySelectorAll('.match-card');
 
     matchContainers.forEach((matchContainer) => {
         const league = matchContainer.getAttribute('league');
@@ -32,22 +32,22 @@ leagueSelector.addEventListener("change", (evt) => {
 document.addEventListener("click", async (evt) => {
     const clickedElement = evt.target;
 
-    if (clickedElement.classList.contains("matchContainer")) {
-        clickedElement.classList.toggle("divSelected");
+    if (clickedElement.classList.contains("match-card")) {
+        clickedElement.classList.toggle("match-card--selected");
 
-    } else if (clickedElement.classList.contains("btnDiv")) {
-        clickedElement.parentElement.classList.toggle("divSelected");
+    } else if (clickedElement.classList.contains("btn-div")) {
+        clickedElement.parentElement.classList.toggle("match-card--selected");
 
-    } else if (clickedElement.classList.contains("closeBtn")) {
-        clickedElement.closest(".matchContainer").style.display = "none";
+    } else if (clickedElement.classList.contains("close-btn")) {
+        clickedElement.closest(".match-card").style.display = "none";
 
-    } else if (clickedElement.classList.contains("dropdownBtn")) {
+    } else if (clickedElement.classList.contains("dropdown-btn")) {
         clickedElement.classList.toggle("active");
         clickedElement.nextElementSibling.classList.toggle("show");
 
-    } else if (clickedElement.classList.contains('periodBtn')) {
+    } else if (clickedElement.classList.contains('period-btn')) {
         // get match ID and selected period
-        const matchCard = clickedElement.closest('.matchContainer');
+        const matchCard = clickedElement.closest('.match-card');
         const matchID = matchCard.id; // get match id from parent div (periodSelector div with the tree btns)
         const selectedPeriodName = clickedElement.getAttribute('data-period'); // get period name form clicked btn
         const selectedPeriodIndex = selectedPeriodName === 'ALL' ? 0 : selectedPeriodName === '1ST' ? 1 : 2;
@@ -55,16 +55,16 @@ document.addEventListener("click", async (evt) => {
         try {
             // get stats for selected period
             const statsReturned = await getMatchStats(matchID, selectedPeriodIndex);
-            // const statsDiv = document.querySelector(`.statsDiv[id="${matchID}"]`);
+            // const statsDiv = document.querySelector(`.stats[id="${matchID}"]`);
 
             if(statsReturned) {
-                const statsDiv = matchCard.querySelector('.statsDiv');
+                const statsDiv = matchCard.querySelector('.stats');
                 updateStatsTextForMatch(statsDiv, statsReturned);
 
                 // update button styles (de-select all and select clicked)
-                const periodButtonSiblings = clickedElement.parentElement.querySelectorAll('.periodBtn'); // get siblings of clicked button
-                periodButtonSiblings.forEach(btn => btn.classList.remove('selected'));
-                clickedElement.classList.add('selected');
+                const periodButtonSiblings = clickedElement.parentElement.querySelectorAll('.period-btn'); // get siblings of clicked button
+                periodButtonSiblings.forEach(btn => btn.classList.remove('period-btn--selected'));
+                clickedElement.classList.add('period-btn--selected');
             }
 
         } catch (error) {
@@ -244,8 +244,8 @@ function updateStatsTextForMatch(statsDiv, statsReturned) {
     statsReturned.forEach(stat => {
         const { key, home, away } = stat; // extract keys from statObj
 
-        const homeStatSpan = statsDiv.querySelector(`.homeTeamsStatsDiv #${key}`);
-        const awayStatSpan = statsDiv.querySelector(`.awayTeamsStatsDiv #${key}`);
+        const homeStatSpan = statsDiv.querySelector(`.stats__home-team #${key}`);
+        const awayStatSpan = statsDiv.querySelector(`.stats__away-team #${key}`);
         if (homeStatSpan) homeStatSpan.innerText = home;
         if (awayStatSpan) awayStatSpan.innerText = away;
     });
@@ -254,14 +254,14 @@ function updateStatsTextForMatch(statsDiv, statsReturned) {
 function updateStatsForAll() {
     // iterate through all statsDivs and update stats for each match
 
-    const statsDivs = document.querySelectorAll('.statsDiv');
+    const statsDivs = document.querySelectorAll('.stats');
 
     statsDivs.forEach(async (statsDiv) => {
         const matchID = statsDiv.id;
 
         // get selected period (ALL, 1ST, 2ND) from the selected button (may put this in a function later...)
-        const selectedPeriodDiv = statsDiv.parentElement.querySelector('.periodSelector');
-        const selectedPeriodName = selectedPeriodDiv.querySelector('.selected').getAttribute('data-period');
+        const selectedPeriodDiv = statsDiv.parentElement.querySelector('.period-selector');
+        const selectedPeriodName = selectedPeriodDiv.querySelector('.period-btn--selected').getAttribute('data-period');
         const selectedPeriodIndex = selectedPeriodName === 'ALL' ? 0 : selectedPeriodName === '1ST' ? 1 : 2;
 
         try {
@@ -283,20 +283,20 @@ function createPeriodSelector(matchID) {
     // create period selector div, add some buttons and return...
 
     const periodSelectorDiv = document.createElement('div');
-    periodSelectorDiv.classList.add('periodSelector');
+    periodSelectorDiv.classList.add('period-selector');
     periodSelectorDiv.setAttribute('id', matchID);
 
     const periods = ['ALL', '1ST', '2ND'];
     periods.forEach(period => {
         const button = document.createElement('button');
 
-        button.classList.add('periodBtn');
+        button.classList.add('period-btn');
         button.setAttribute('data-period', period);
         button.textContent = period;
 
         // set ALL as default selected
         if (period === 'ALL') {
-            button.classList.add('selected');
+            button.classList.add('period-btn--selected');
         }
 
         periodSelectorDiv.appendChild(button);
@@ -307,7 +307,7 @@ function createPeriodSelector(matchID) {
 
 function createMatchCard(match) {
     const matchCard = document.createElement('div');
-    matchCard.classList.add("matchContainer");
+    matchCard.classList.add("match-card");
     matchCard.setAttribute('draggable', 'true');
     matchCard.setAttribute('league', match.tournament.name);
     matchCard.setAttribute('id', match.id);
@@ -315,10 +315,10 @@ function createMatchCard(match) {
     const iframeElement = createIframeElementFor(match.id);
 
     const matchCardHeader = document.createElement('div');
-    matchCardHeader.classList.add('matchCardHeader');
+    matchCardHeader.classList.add('match-card__header');
 
     const btnRemoveCard = document.createElement('button');
-    btnRemoveCard.classList.add('closeBtn');
+    btnRemoveCard.classList.add('close-btn');
     btnRemoveCard.innerText = "X";
     matchCardHeader.appendChild(btnRemoveCard);
 
@@ -334,7 +334,7 @@ function createMatchCard(match) {
     matchCard.appendChild(periodSelectorDiv);
 
     const statsDiv = document.createElement('div');
-    statsDiv.classList.add('statsDiv');
+    statsDiv.classList.add('stats');
     statsDiv.setAttribute('id', match.id);
 
     const statConfigs = [
@@ -354,10 +354,10 @@ function createMatchCard(match) {
     ];
 
     const divHomeTeamStats = document.createElement('div');
-    divHomeTeamStats.classList.add('homeTeamsStatsDiv');
+    divHomeTeamStats.classList.add('stats__home-team');
 
     const divAwayTeamStats = document.createElement('div');
-    divAwayTeamStats.classList.add('awayTeamsStatsDiv');
+    divAwayTeamStats.classList.add('stats__away-team');
 
     statConfigs.forEach(stat => {
         const homeStatDiv = document.createElement('div');

@@ -15,14 +15,14 @@ function handleDragOver(event) {
 }
 
 function handleDragEnter(event) {
-    if (event.target.classList.contains('matchContainer')) {
-        event.target.classList.add('over');
+    if (event.target.classList.contains('match-card')) {
+        event.target.classList.add('match-card--drag-over');
     }
 }
 
 function handleDragLeave(event) {
-    if (event.target.classList.contains('matchContainer')) {
-        event.target.classList.remove('over');
+    if (event.target.classList.contains('match-card')) {
+        event.target.classList.remove('match-card--drag-over');
     }
 }
 
@@ -30,7 +30,7 @@ function handleDrop(event) {
     event.preventDefault();
     event.stopPropagation();
 
-    if (draggedElement !== event.target && event.target.classList.contains('matchContainer')) {
+    if (draggedElement !== event.target && event.target.classList.contains('match-card')) {
         // Swap innerHTML and div attributes
 
         const draggedLeagueAtt = draggedElement.getAttribute('league');
@@ -56,8 +56,8 @@ function handleDrop(event) {
 function handleDragEnd(event) {
     event.target.style.opacity = "1.0";
 
-    document.querySelectorAll('.matchContainer').forEach(item => {
-        item.classList.remove('over');
+    document.querySelectorAll('.match-card').forEach(item => {
+        item.classList.remove('match-card--drag-over');
     });
 }
 
