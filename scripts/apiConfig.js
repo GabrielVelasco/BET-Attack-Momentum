@@ -1,5 +1,5 @@
 const API_CONFIG = {
-    baseUrl: 'http://127.0.0.1:3000',
+    baseUrl: 'http://[2804:4b10:501:e600:fc5f:9557:efe5:b898]:3000',
 };
 
 // Helper function to make API requests
