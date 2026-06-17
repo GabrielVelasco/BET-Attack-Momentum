@@ -1,5 +1,5 @@
 const API_CONFIG = {
-    baseUrl: "https://f666-2804-4b10-501-e600-fc5f-9557-efe5-b898.ngrok-free.app",
+    baseUrl: "https://5d7b-2804-4b10-501-e600-ab77-2dbb-4886-5fde.ngrok-free.app",
     headers: {
       "ngrok-skip-browser-warning": "true",
       "Accept": "application/json"
