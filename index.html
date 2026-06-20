@@ -13,49 +13,60 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Live football match scoreboards and stats.">
+    <meta name="description" content="Live football attack momentum graphs, scoreboards, and match stats.">
     <meta name="author" content="Gabriel A. Velasco">
     <link rel="icon" href="imgs/unxuxyqi.ico" type="image/x-icon">
-    <title>Attack Momentum</title>
-
-    <!-- Include CSS -->
     <link rel="stylesheet" href="styles/apps.css">
-
-    <!-- Axios script -->
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <title>Attack Momentum</title>
 </head>
 
 <body>
-    <header>
-        <h1>Attack Momentum</h1>
-        <ul>
-            <li>SofaScore doesn't provide graphs for all matches.</li>
-            <li><b>Scoreboards/Stats</b> are <b>updated automatically.</b></li>
-            <li>Use zoom for better viewing (<b>CTRL</b> + <b>ScrollDown</b>/<b>ScrollUp</b>).</li>
-            <li><b>Drag/Select</b> a match card by clicking/holding at the <b>background</b> of it.</li>
-        </ul>           
+    <header class="app-header">
+        <div class="app-header__content">
+            <p class="eyebrow">Live football monitor</p>
+            <h1>Attack Momentum</h1>
+            <p class="app-header__summary">Pressure graphs, scoreboards, and match stats for finding live attacking pressure.</p>
+        </div>
     </header>
 
-    <main>
-        <div class="league-selector">
-            <label for="leagueSelector">Select League: </label>
-            <select id="leagueSelector">
-                <option value="All">All Leagues</option>
-            </select>
-        </div>
+    <main class="app-shell">
+        <section class="toolbar" aria-label="Match board controls">
+            <label class="field" for="leagueSelector">
+                <span>League</span>
+                <select id="leagueSelector">
+                    <option value="All">All leagues</option>
+                </select>
+            </label>
 
-        <div class="main-container"></div>
+            <label class="field field--search" for="matchSearch">
+                <span>Search</span>
+                <input id="matchSearch" type="search" placeholder="Team or league">
+            </label>
+
+            <button id="refreshButton" class="button button--primary" type="button">Refresh</button>
+        </section>
+
+        <section class="board-status" aria-live="polite">
+            <div>
+                <span id="statusDot" class="status-dot"></span>
+                <span id="statusText">Waiting for live matches</span>
+            </div>
+            <div>
+                <span id="matchCount">0 matches</span>
+                <span id="lastUpdated">Not updated yet</span>
+            </div>
+        </section>
+
+        <p id="emptyState" class="empty-state" hidden>No live matches with available pressure graphs right now.</p>
+        <section class="main-container" aria-label="Live match cards"></section>
     </main>
 
     <footer>
-        <p><strong>Attack Momentum</strong> is a project that uses <strong>SofaScore API</strong> to provide live football match scoreboards and stats.</p>
-        <p>This version was entirely made with vanilla HTML/JS/CSS, so the code may be a mess...</p>
-        <p>More details: <a href="https://github.com/GabrielVelasco/BET-Attack-Momentum" target="_blank" rel="noopener noreferrer"><strong>GitHub Repo</strong></a></p>
+        <p><strong>Attack Momentum</strong> uses a Fastify proxy to request SofaScore data and render live match context.</p>
+        <p><a href="https://github.com/GabrielVelasco/BET-Attack-Momentum" target="_blank" rel="noopener noreferrer">GitHub Repo</a></p>
     </footer>
 
-    <!-- js modules... -->
     <script src="scripts/app.js" type="module"></script>
-    <script src="scripts/dragAndDrop.js" type="module"></script>
 </body>
 
 </html>

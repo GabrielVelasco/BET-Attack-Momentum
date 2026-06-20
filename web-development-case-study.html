@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="imgs/unxuxyqi.ico" type="image/x-icon">
+    <title>Attack Momentum - Web Development Case Study</title>
+    <style>
+        :root {
+            --bg: #f6f7f8;
+            --surface: #ffffff;
+            --surface-muted: #eef1f3;
+            --text: #172026;
+            --muted: #66737e;
+            --border: #d8dee4;
+            --accent: #146c63;
+            --accent-soft: rgba(20, 108, 99, 0.1);
+            --danger: #9f2a1f;
+            --warning: #8a5a00;
+            --code: #111827;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            line-height: 1.6;
+        }
+
+        a {
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .hero {
+            border-bottom: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        .hero__inner,
+        main {
+            width: min(1120px, calc(100% - 32px));
+            margin: 0 auto;
+        }
+
+        .hero__inner {
+            padding: 42px 0 32px;
+        }
+
+        .eyebrow {
+            margin: 0 0 8px;
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            max-width: 820px;
+            margin: 0;
+            font-size: clamp(32px, 5vw, 54px);
+            line-height: 1.02;
+        }
+
+        .lead {
+            max-width: 820px;
+            margin: 18px 0 0;
+            color: var(--muted);
+            font-size: 18px;
+        }
+
+        main {
+            padding: 28px 0 56px;
+        }
+
+        .toc,
+        section,
+        .principle {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--surface);
+        }
+
+        .toc {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            background: var(--border);
+        }
+
+        .toc a {
+            display: block;
+            min-height: 56px;
+            background: var(--surface);
+            padding: 14px;
+            color: var(--text);
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .toc a:hover {
+            background: var(--surface-muted);
+        }
+
+        section {
+            margin-top: 18px;
+            padding: 24px;
+        }
+
+        h2 {
+            margin: 0 0 14px;
+            font-size: 24px;
+            line-height: 1.2;
+        }
+
+        h3 {
+            margin: 26px 0 8px;
+            font-size: 18px;
+        }
+
+        p {
+            margin: 10px 0;
+        }
+
+        ul,
+        ol {
+            padding-left: 22px;
+        }
+
+        li + li {
+            margin-top: 8px;
+        }
+
+        code {
+            border-radius: 5px;
+            background: var(--surface-muted);
+            padding: 2px 5px;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+            font-size: 0.92em;
+        }
+
+        pre {
+            overflow-x: auto;
+            border-radius: 8px;
+            background: var(--code);
+            color: #f8fafc;
+            padding: 16px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .card,
+        .metric {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #fbfcfd;
+            padding: 16px;
+        }
+
+        .card h3,
+        .metric strong {
+            margin-top: 0;
+        }
+
+        .metric {
+            display: grid;
+            gap: 6px;
+        }
+
+        .metric strong {
+            color: var(--accent);
+            font-size: 24px;
+            line-height: 1;
+        }
+
+        .metric span {
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        .callout {
+            border-left: 4px solid var(--accent);
+            border-radius: 8px;
+            background: var(--accent-soft);
+            padding: 14px 16px;
+        }
+
+        .callout.warning {
+            border-left-color: var(--warning);
+            background: rgba(138, 90, 0, 0.1);
+        }
+
+        .callout.danger {
+            border-left-color: var(--danger);
+            background: rgba(159, 42, 31, 0.1);
+        }
+
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .comparison h3 {
+            margin-top: 0;
+        }
+
+        .before {
+            border-top: 4px solid var(--danger);
+        }
+
+        .after {
+            border-top: 4px solid var(--accent);
+        }
+
+        .principles {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+        }
+
+        .principle {
+            padding: 16px;
+        }
+
+        .principle strong {
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .timeline {
+            display: grid;
+            gap: 12px;
+            counter-reset: step;
+        }
+
+        .timeline li {
+            display: grid;
+            grid-template-columns: 42px 1fr;
+            gap: 12px;
+            align-items: start;
+            list-style: none;
+            counter-increment: step;
+        }
+
+        .timeline li::before {
+            display: grid;
+            width: 34px;
+            height: 34px;
+            place-items: center;
+            border-radius: 999px;
+            background: var(--accent);
+            color: white;
+            content: counter(step);
+            font-weight: 800;
+        }
+
+        footer {
+            width: min(1120px, calc(100% - 32px));
+            margin: 0 auto;
+            border-top: 1px solid var(--border);
+            padding: 24px 0 40px;
+            color: var(--muted);
+            font-size: 14px;
+        }
+
+        @media (max-width: 800px) {
+            .toc,
+            .grid,
+            .comparison,
+            .principles {
+                grid-template-columns: 1fr;
+            }
+
+            section {
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header class="hero">
+        <div class="hero__inner">
+            <p class="eyebrow">Learning from a real refactor</p>
+            <h1>Attack Momentum frontend case study</h1>
+            <p class="lead">
+                This document explains what existed before, why some choices were limiting the project,
+                what was improved, and what engineering lessons you can take from the session.
+            </p>
+        </div>
+    </header>
+
+    <main>
+        <nav class="toc" aria-label="Table of contents">
+            <a href="#context">1. Context</a>
+            <a href="#before">2. Before</a>
+            <a href="#problems">3. Problems</a>
+            <a href="#implementation">4. Implementation</a>
+            <a href="#results">5. Results</a>
+            <a href="#security">6. Security</a>
+            <a href="#lessons">7. Lessons</a>
+            <a href="#next">8. Next steps</a>
+        </nav>
+
+        <section id="context">
+            <h2>1. Project Context</h2>
+            <p>
+                Attack Momentum is a static frontend that shows live football matches, SofaScore attack
+                momentum widgets, scores, and statistics. A separate Fastify proxy requests SofaScore data
+                because the browser cannot safely and reliably call the upstream API directly.
+            </p>
+
+            <div class="grid">
+                <div class="card">
+                    <h3>Frontend</h3>
+                    <p>
+                        A vanilla HTML, CSS, and JavaScript app hosted as static files, currently suitable
+                        for GitHub Pages. It renders match cards, filters by league, loads widgets, and
+                        refreshes live scores and stats.
+                    </p>
+                </div>
+                <div class="card">
+                    <h3>Backend Proxy</h3>
+                    <p>
+                        A Fastify server that exposes endpoints like <code>/api/live</code> and
+                        <code>/api/:eventId/stats</code>. It hides SofaScore scraping details from the
+                        frontend and can enforce cache, CORS, rate limits, and request policy.
+                    </p>
+                </div>
+            </div>
+
+            <p class="callout">
+                Senior frontend work is not only about making things prettier. It is about aligning
+                rendering, data fetching, user interaction, performance, and security boundaries with the
+                real purpose of the product.
+            </p>
+        </section>
+
+        <section id="before">
+            <h2>2. What Was There Before</h2>
+            <p>
+                The previous app was already useful: it showed live matches, embedded attack momentum graphs,
+                displayed selected stats, supported a league dropdown, and had basic drag-and-drop card
+                organization. The architecture was intentionally simple: one HTML file, one CSS file, and
+                a few JavaScript modules.
+            </p>
+
+            <div class="comparison">
+                <div class="card before">
+                    <h3>Original Interaction Model</h3>
+                    <ul>
+                        <li>Load live events from the proxy.</li>
+                        <li>Create one card for each eligible match.</li>
+                        <li>Put a SofaScore iframe directly in each card.</li>
+                        <li>Refresh scores and stats on timers.</li>
+                        <li>Filter by league by changing card display styles.</li>
+                    </ul>
+                </div>
+
+                <div class="card before">
+                    <h3>Original Code Shape</h3>
+                    <ul>
+                        <li>DOM was built imperatively in <code>scripts/app.js</code>.</li>
+                        <li>API calls used Axios loaded from a CDN.</li>
+                        <li>Drag-and-drop swapped <code>innerHTML</code> between cards.</li>
+                        <li>Filtering reloaded iframes by resetting their <code>src</code>.</li>
+                        <li>The proxy URL was editable from the UI after the first refactor pass.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <p>
+                None of those choices are unusual for an early prototype. They are fast to write, easy to
+                understand at first, and good enough to prove that the idea works. The problem is that
+                prototype choices often become production bottlenecks if they are not revisited.
+            </p>
+        </section>
+
+        <section id="problems">
+            <h2>3. What Was Wrong With It</h2>
+
+            <h3>Performance problems</h3>
+            <ul>
+                <li>
+                    <strong>All graph iframes loaded immediately.</strong> Iframes are expensive because each
+                    one creates a separate embedded browsing context. Loading many of them on page start makes
+                    the app slower even before the user scrolls.
+                </li>
+                <li>
+                    <strong>Filtering could reload iframes.</strong> Resetting an iframe <code>src</code> when
+                    a card becomes visible costs network, CPU, and time. A filter should usually change
+                    visibility, not reload content.
+                </li>
+                <li>
+                    <strong>Stats requests had weak flow control.</strong> Running many async requests from a
+                    loop can overwhelm the proxy and make the UI harder to reason about when many matches are live.
+                </li>
+            </ul>
+
+            <h3>Maintainability problems</h3>
+            <ul>
+                <li>
+                    <strong>Drag-and-drop swapped HTML strings.</strong> This breaks the mental model of the DOM.
+                    Event state, selected periods, iframe state, and future component state can be lost or duplicated.
+                </li>
+                <li>
+                    <strong>The page had no clear state model.</strong> It relied heavily on querying and mutating
+                    scattered DOM nodes. That makes future changes riskier.
+                </li>
+                <li>
+                    <strong>UI and data behavior were mixed together.</strong> For example, filtering also touched
+                    iframe loading. Good UI code tries to keep unrelated effects separate.
+                </li>
+            </ul>
+
+            <h3>Usability problems</h3>
+            <ul>
+                <li>The user had to visually scan many cards without a search box.</li>
+                <li>The status of refreshes was mostly hidden in the console.</li>
+                <li>The old layout asked users to rely on browser zoom instead of responsive design.</li>
+                <li>The stats were split by home and away columns, which made comparison slower.</li>
+            </ul>
+
+            <h3>Security and exposure problems</h3>
+            <ul>
+                <li>
+                    The proxy initially reflected any browser <code>Origin</code> in CORS headers, so any site
+                    could make browser requests to the proxy if it knew the URL.
+                </li>
+                <li>
+                    The temporary visible API URL control was useful during development, but it exposed too much
+                    implementation detail to users.
+                </li>
+            </ul>
+
+            <p class="callout warning">
+                Important architectural lesson: hiding a URL in frontend code is not real security. If the
+                browser can request it, users can inspect it. Protection must live on the server through
+                origin policy, rate limits, auth, quotas, caching, and abuse detection.
+            </p>
+        </section>
+
+        <section id="implementation">
+            <h2>4. How The Improvements Were Implemented</h2>
+
+            <ol class="timeline">
+                <li>
+                    <div>
+                        <h3>Reworked the page structure</h3>
+                        <p>
+                            The app header became simpler, and the main controls became a dashboard toolbar:
+                            league filter, search field, refresh button, match count, status text, and last update time.
+                        </p>
+                    </div>
+                </li>
+
+                <li>
+                    <div>
+                        <h3>Moved from CDN Axios to native fetch</h3>
+                        <p>
+                            The app no longer needs a third-party script just to make HTTP requests. Modern browsers
+                            already provide <code>fetch</code>, <code>AbortController</code>, and JSON parsing.
+                        </p>
+                        <pre><code>const controller = new AbortController();
+const timeout = window.setTimeout(() =&gt; controller.abort(), 15000);
+
+const response = await fetch(`${baseUrl}${path}`, {
+    headers,
+    signal: controller.signal
+});</code></pre>
+                    </div>
+                </li>
+
+                <li>
+                    <div>
+                        <h3>Introduced state-driven rendering</h3>
+                        <p>
+                            Instead of rebuilding or mutating cards blindly, the app tracks live matches, reuses
+                            existing cards when possible, removes stale cards, and updates only the fields that changed.
+                        </p>
+                    </div>
+                </li>
+
+                <li>
+                    <div>
+                        <h3>Lazy-loaded graph iframes</h3>
+                        <p>
+                            The app now creates iframes with a <code>data-src</code> first, then hydrates the real
+                            <code>src</code> only when the card gets close to the viewport.
+                        </p>
+                        <pre><code>const observer = new IntersectionObserver((entries) =&gt; {
+    entries.forEach((entry) =&gt; {
+        if (!entry.isIntersecting) return;
+        hydrateIframe(entry.target);
+        observer.unobserve(entry.target);
+    });
+});</code></pre>
+                    </div>
+                </li>
+
+                <li>
+                    <div>
+                        <h3>Limited parallel stats requests</h3>
+                        <p>
+                            Stats refreshes now run with a small worker pool. This protects the proxy from bursts
+                            while still updating multiple visible cards efficiently.
+                        </p>
+                    </div>
+                </li>
+
+                <li>
+                    <div>
+                        <h3>Replaced HTML-swapping drag-and-drop</h3>
+                        <p>
+                            Drag-and-drop now moves actual card nodes in the DOM using <code>insertBefore</code>.
+                            This keeps each card's iframe, selected period, event listeners, and state intact.
+                        </p>
+                    </div>
+                </li>
+
+                <li>
+                    <div>
+                        <h3>Improved stats presentation</h3>
+                        <p>
+                            Stats became one comparison table per card: home value, stat label, away value. The
+                            leading value gets highlighted, making scanning faster.
+                        </p>
+                    </div>
+                </li>
+
+                <li>
+                    <div>
+                        <h3>Removed the visible API control</h3>
+                        <p>
+                            The public page no longer shows or accepts a proxy URL override. That keeps the interface
+                            focused and avoids teaching users to interact with internal infrastructure.
+                        </p>
+                    </div>
+                </li>
+
+                <li>
+                    <div>
+                        <h3>Tightened proxy CORS behavior</h3>
+                        <p>
+                            The Fastify proxy now rejects <code>/api/*</code> browser requests that do not come from
+                            an allowed origin. GitHub Pages is allowed, and localhost origins remain allowed for development.
+                        </p>
+                        <pre><code>const isApiRequest = request.url.startsWith("/api/");
+const isAllowedOrigin = origin &amp;&amp; allowedOrigins.includes(origin);
+
+if (isApiRequest &amp;&amp; !isAllowedOrigin) {
+    return reply.status(403).send({ error: "Forbidden origin" });
+}</code></pre>
+                    </div>
+                </li>
+            </ol>
+        </section>
+
+        <section id="results">
+            <h2>5. Results Brought By The Changes</h2>
+
+            <div class="grid">
+                <div class="metric">
+                    <strong>Less initial work</strong>
+                    <span>Iframes are loaded near the viewport instead of all at once.</span>
+                </div>
+                <div class="metric">
+                    <strong>More stable UI</strong>
+                    <span>Filtering no longer reloads graph widgets unnecessarily.</span>
+                </div>
+                <div class="metric">
+                    <strong>Safer interactions</strong>
+                    <span>Drag-and-drop preserves card nodes instead of replacing HTML strings.</span>
+                </div>
+                <div class="metric">
+                    <strong>Better scanning</strong>
+                    <span>Search, status, match counts, and highlighted stat leaders reduce cognitive load.</span>
+                </div>
+            </div>
+
+            <h3>Validation performed</h3>
+            <ul>
+                <li>JavaScript syntax checks passed with <code>node --check</code>.</li>
+                <li>The app loaded in Chromium with mocked API responses and no console/page errors.</li>
+                <li>Search, filtering, stat rendering, empty state, and responsive layout were checked.</li>
+                <li>The proxy returned <code>403</code> for disallowed or missing origins and allowed the GitHub Pages preflight.</li>
+            </ul>
+
+            <p class="callout">
+                The result is still a vanilla static app, but it behaves more like a real monitoring tool:
+                controls are visible, updates are understandable, and expensive work is deferred or controlled.
+            </p>
+        </section>
+
+        <section id="security">
+            <h2>6. Security Lesson: Frontend Visibility vs Backend Enforcement</h2>
+
+            <p>
+                A common misconception is that removing a visible button or hiding a URL from the UI secures an API.
+                It improves presentation, but it does not create a security boundary.
+            </p>
+
+            <div class="comparison">
+                <div class="card before">
+                    <h3>Not Real Security</h3>
+                    <ul>
+                        <li>Removing a button.</li>
+                        <li>Minifying JavaScript.</li>
+                        <li>Using an obscure ngrok URL.</li>
+                        <li>Relying on users not opening DevTools.</li>
+                    </ul>
+                </div>
+
+                <div class="card after">
+                    <h3>Better Server-Side Controls</h3>
+                    <ul>
+                        <li>Strict CORS for browser clients.</li>
+                        <li>Rate limiting by IP or token.</li>
+                        <li>Short cache TTLs to reduce upstream load.</li>
+                        <li>Request logging and abuse detection.</li>
+                        <li>Optional authentication for private usage.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <p class="callout danger">
+                CORS blocks normal browser-based abuse from other websites, but it does not stop scripts,
+                curl, bots, or custom clients from sending forged headers. Treat CORS as one layer, not the whole defense.
+            </p>
+        </section>
+
+        <section id="lessons">
+            <h2>7. Web Development Lessons For The AI Era</h2>
+
+            <div class="principles">
+                <div class="principle">
+                    <strong>Understand the system shape</strong>
+                    <span>Before changing code, map the architecture: static frontend, proxy server, upstream API, browser widgets, and deployment.</span>
+                </div>
+                <div class="principle">
+                    <strong>Separate concerns</strong>
+                    <span>Filtering should filter. It should not reload iframes. Dragging should reorder nodes. It should not rewrite card HTML.</span>
+                </div>
+                <div class="principle">
+                    <strong>Make costs visible</strong>
+                    <span>Iframes, network requests, timers, and DOM mutations all have costs. Good architecture controls when those costs happen.</span>
+                </div>
+                <div class="principle">
+                    <strong>Design for the real workflow</strong>
+                    <span>This app is not a marketing page. It is a live match monitor, so density, scanning, filtering, and status matter most.</span>
+                </div>
+                <div class="principle">
+                    <strong>Use AI as leverage, not autopilot</strong>
+                    <span>Ask AI to explain tradeoffs, but verify behavior with tests, browser checks, and your own understanding.</span>
+                </div>
+                <div class="principle">
+                    <strong>Protect at the right layer</strong>
+                    <span>Frontend code improves UX. Backend code enforces policy. Do not confuse hiding controls with securing infrastructure.</span>
+                </div>
+            </div>
+
+            <h3>Questions to ask during any refactor</h3>
+            <ul>
+                <li>What user workflow is this interface really optimizing for?</li>
+                <li>Which operations are expensive, and when do they happen?</li>
+                <li>What state does the UI need to preserve?</li>
+                <li>What belongs in frontend code, and what must be enforced on the server?</li>
+                <li>How will I verify that the change works?</li>
+                <li>What did I make easier for the next developer?</li>
+            </ul>
+        </section>
+
+        <section id="next">
+            <h2>8. Good Next Improvements</h2>
+
+            <p>
+                The current refactor improves the app without introducing a framework. That was the right scope for
+                a small static project. If the project continues growing, these are strong next steps:
+            </p>
+
+            <ul>
+                <li>Add proxy-side rate limiting, especially for public ngrok exposure.</li>
+                <li>Move the API base URL to deploy-time configuration instead of editing source for each tunnel.</li>
+                <li>Add lightweight frontend tests for filtering, period switching, and card rendering.</li>
+                <li>Persist user card order and dismissed matches in local storage.</li>
+                <li>Add a "show hidden matches" action so dismissing a card is reversible.</li>
+                <li>Consider a small framework only if state and UI complexity continue growing.</li>
+            </ul>
+
+            <p class="callout">
+                The senior-level skill is not "always use React" or "never use frameworks." The skill is
+                recognizing the current complexity level and choosing the smallest architecture that handles it well.
+            </p>
+        </section>
+    </main>
+
+    <footer>
+        <p>
+            Created from the Attack Momentum refactor session as a practical study guide for frontend architecture,
+            performance, usability, and security tradeoffs.
+        </p>
+    </footer>
+</body>
+
+</html>

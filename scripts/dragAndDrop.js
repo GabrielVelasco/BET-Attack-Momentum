@@ -1,73 +1,70 @@
-// Drag and Drop functions
 let draggedElement = null;
+const boundCards = new WeakSet();
+
+function getMatchCard(event) {
+    return event.target.closest(".match-card");
+}
 
 function handleDragStart(event) {
-    draggedElement = event.target;
-    event.target.style.opacity = "0.5";
-    event.dataTransfer.effectAllowed = 'move';
-    event.dataTransfer.setData('text/html', event.target.innerHTML);
+    const card = getMatchCard(event);
+    if (!card) return;
+
+    draggedElement = card;
+    card.classList.add("match-card--dragging");
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", card.dataset.id || card.id);
 }
 
 function handleDragOver(event) {
-    event.preventDefault();
-    event.dataTransfer.dropEffect = 'move';
-    return false;
-}
+    const card = getMatchCard(event);
+    if (!card || card === draggedElement) return;
 
-function handleDragEnter(event) {
-    if (event.target.classList.contains('match-card')) {
-        event.target.classList.add('match-card--drag-over');
-    }
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+    card.classList.add("match-card--drag-over");
 }
 
 function handleDragLeave(event) {
-    if (event.target.classList.contains('match-card')) {
-        event.target.classList.remove('match-card--drag-over');
-    }
+    const card = getMatchCard(event);
+    if (card) card.classList.remove("match-card--drag-over");
 }
 
 function handleDrop(event) {
+    const targetCard = getMatchCard(event);
+
+    if (!draggedElement || !targetCard || targetCard === draggedElement) return;
+
     event.preventDefault();
     event.stopPropagation();
 
-    if (draggedElement !== event.target && event.target.classList.contains('match-card')) {
-        // Swap innerHTML and div attributes
+    const targetRect = targetCard.getBoundingClientRect();
+    const shouldPlaceAfter = event.clientY > targetRect.top + targetRect.height / 2;
 
-        const draggedLeagueAtt = draggedElement.getAttribute('league');
-        const draggedMatchId = draggedElement.getAttribute('id');
-        const targetLeagueAtt = event.target.getAttribute('league');
-        const targetMatchId = event.target.getAttribute('id');
-
-        const tmp = draggedElement.innerHTML;
-        draggedElement.innerHTML = event.target.innerHTML;
-        draggedElement.setAttribute('league', targetLeagueAtt);
-        draggedElement.setAttribute('id', targetMatchId);
-
-        event.target.innerHTML = tmp;
-        event.target.setAttribute('league', draggedLeagueAtt);
-        event.target.setAttribute('id', draggedMatchId);
-
-        addDragAndDropHandlers(draggedElement); // Re-apply handlers to new elements
-        addDragAndDropHandlers(event.target);
-    }
-    return false;
+    targetCard.parentElement.insertBefore(
+        draggedElement,
+        shouldPlaceAfter ? targetCard.nextSibling : targetCard
+    );
 }
 
-function handleDragEnd(event) {
-    event.target.style.opacity = "1.0";
+function handleDragEnd() {
+    if (draggedElement) draggedElement.classList.remove("match-card--dragging");
 
-    document.querySelectorAll('.match-card').forEach(item => {
-        item.classList.remove('match-card--drag-over');
+    document.querySelectorAll(".match-card--drag-over").forEach((card) => {
+        card.classList.remove("match-card--drag-over");
     });
+
+    draggedElement = null;
 }
 
 function addDragAndDropHandlers(element) {
-    element.addEventListener('dragstart', handleDragStart, false);
-    element.addEventListener('dragenter', handleDragEnter, false);
-    element.addEventListener('dragover', handleDragOver, false);
-    element.addEventListener('dragleave', handleDragLeave, false);
-    element.addEventListener('drop', handleDrop, false);
-    element.addEventListener('dragend', handleDragEnd, false);
+    if (boundCards.has(element)) return;
+
+    element.addEventListener("dragstart", handleDragStart, false);
+    element.addEventListener("dragover", handleDragOver, false);
+    element.addEventListener("dragleave", handleDragLeave, false);
+    element.addEventListener("drop", handleDrop, false);
+    element.addEventListener("dragend", handleDragEnd, false);
+    boundCards.add(element);
 }
 
 export { addDragAndDropHandlers };

@@ -1,32 +1,48 @@
-const API_CONFIG = {
-    baseUrl: "https://e00c-2804-4b10-501-e600-bd2a-976a-1e52-1e0f.ngrok-free.app",
-    headers: {
-      "ngrok-skip-browser-warning": "true",
-      "Accept": "application/json"
-    }
-  };
+const DEFAULT_API_BASE_URL = "https://e00c-2804-4b10-501-e600-bd2a-976a-1e52-1e0f.ngrok-free.app";
 
-  // Helper function to make API requests
-  async function getLiveEventsList() {
+const API_HEADERS = {
+    "ngrok-skip-browser-warning": "true",
+    "Accept": "application/json"
+};
+
+function getApiBaseUrl() {
+    return DEFAULT_API_BASE_URL;
+}
+
+async function requestJson(path) {
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 15000);
+
     try {
-      return await axios.get(`${API_CONFIG.baseUrl}/api/live`, {
-        headers: API_CONFIG.headers
-      });
-    } catch (error) {
-      console.error("Error making API request:", error);
-      throw error;
-    }
-  }
+        const response = await fetch(`${getApiBaseUrl()}${path}`, {
+            headers: API_HEADERS,
+            signal: controller.signal
+        });
 
-  async function getSatsFromAPI(matchID) {
-    try {
-      return await axios.get(`${API_CONFIG.baseUrl}/api/${matchID}/stats`, {
-        headers: API_CONFIG.headers
-      });
-    } catch (error) {
-      console.error("Error making API request:", error);
-      throw error;
-    }
-  }
+        const data = await response.json().catch(() => ({}));
 
-  export { getLiveEventsList, getSatsFromAPI };
+        if (!response.ok) {
+            const message = data.error || `Request failed with status ${response.status}`;
+            throw new Error(message);
+        }
+
+        return data;
+    } finally {
+        window.clearTimeout(timeout);
+    }
+}
+
+function getLiveEventsList() {
+    return requestJson("/api/live");
+}
+
+function getSatsFromAPI(matchID) {
+    return requestJson(`/api/${matchID}/stats`);
+}
+
+export {
+    DEFAULT_API_BASE_URL,
+    getApiBaseUrl,
+    getLiveEventsList,
+    getSatsFromAPI
+};
