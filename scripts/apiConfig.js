@@ -1,4 +1,4 @@
-const DEFAULT_API_BASE_URL = "https://5f48-2804-4b10-503-1800-8d91-6a27-5224-e849.ngrok-free.app";
+const DEFAULT_API_BASE_URL = "https://f872-2804-4b10-503-1800-8d91-6a27-5224-e849.ngrok-free.app";
 
 const API_HEADERS = {
     "ngrok-skip-browser-warning": "true",
