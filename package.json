@@ -3,8 +3,12 @@
   "version": "0.1.0",
   "description": "A Web Site that gather all football live matches pressure graphs/score from SofaScore.",
   "main": "index.html",
+  "engines": {
+    "node": ">=22 <23"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js",
+    "test": "node --test",
     "deploy": "gh-pages -d build -r git@github.com:GabrielVelasco/BET-Attack-Momentum.git"
   },
   "repository": {
