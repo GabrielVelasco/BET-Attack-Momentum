@@ -1,7 +1,6 @@
-const DEFAULT_API_BASE_URL = "https://df65-2804-4b10-505-bc00-6c7c-8924-8e67-7a02.ngrok-free.app";
+const DEFAULT_API_BASE_URL = "https://www.sofascore.com";
 
 const API_HEADERS = {
-    "ngrok-skip-browser-warning": "true",
     "Accept": "application/json"
 };
 
@@ -33,11 +32,11 @@ async function requestJson(path) {
 }
 
 function getLiveEventsList() {
-    return requestJson("/api/live");
+    return requestJson("/api/v1/sport/football/events/live");
 }
 
 function getSatsFromAPI(matchID) {
-    return requestJson(`/api/${matchID}/stats`);
+    return requestJson(`/api/v1/event/${matchID}/statistics`);
 }
 
 export {
