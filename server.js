@@ -23,7 +23,7 @@ function createProxyServer({ fetchImpl = fetch, allowedOrigins = DEFAULT_ALLOWED
         if (request.method === "OPTIONS") {
             response.writeHead(204, {
                 "Access-Control-Allow-Methods": "GET, OPTIONS",
-                "Access-Control-Allow-Headers": "Accept"
+                "Access-Control-Allow-Headers": "Accept, ngrok-skip-browser-warning"
             });
             response.end();
             return;

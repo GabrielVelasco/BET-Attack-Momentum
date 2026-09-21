@@ -49,10 +49,20 @@ test("allows the GitHub Pages origin and rejects other browser origins", async (
     try {
         const url = `http://127.0.0.1:${server.address().port}/api/live`;
         const allowed = await fetch(url, { headers: { Origin: "https://gabrielvelasco.github.io" } });
+        const preflight = await fetch(url, {
+            method: "OPTIONS",
+            headers: {
+                Origin: "https://gabrielvelasco.github.io",
+                "Access-Control-Request-Method": "GET",
+                "Access-Control-Request-Headers": "ngrok-skip-browser-warning"
+            }
+        });
         const forbidden = await fetch(url, { headers: { Origin: "https://other.example" } });
 
         assert.equal(allowed.status, 200);
         assert.equal(allowed.headers.get("access-control-allow-origin"), "https://gabrielvelasco.github.io");
+        assert.equal(preflight.status, 204);
+        assert.match(preflight.headers.get("access-control-allow-headers"), /ngrok-skip-browser-warning/);
         assert.equal(forbidden.status, 403);
         assert.equal(upstreamCalls, 1);
     } finally {
