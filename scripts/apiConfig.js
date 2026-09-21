@@ -1,5 +1,5 @@
 // Set this to the public URL of the deployed Node proxy for the GitHub Pages site.
-const DEPLOYED_PROXY_BASE_URL = "https://24de-2804-4b10-500-fc00-f10a-c60c-495b-a80f.ngrok-free.app";
+const DEPLOYED_PROXY_BASE_URL = "https://2b74-2804-4b10-500-fc00-f10a-c60c-495b-a80f.ngrok-free.app";
 const DEFAULT_API_BASE_URL = ["localhost", "127.0.0.1"].includes(window.location.hostname)
     ? "http://localhost:3001"
     : DEPLOYED_PROXY_BASE_URL;
